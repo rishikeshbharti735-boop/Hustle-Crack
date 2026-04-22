@@ -1,5 +1,5 @@
 """
-Hustle & Crack - Main Flask Application
+Hustle & Crack - Main Flask Application (Render Optimized)
 Handles routes, database operations, file uploads, PDF parsing, and report generation.
 """
 
@@ -30,18 +30,21 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 
 # ---------------------------
-# App Configuration
+# App Configuration - Render Compatible
 # ---------------------------
 app = Flask(__name__)
 
-# Fix: Absolute path for SQLite database (prevents deletion on Render)
+# Absolute paths for Render
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SECRET_KEY'] = 'hustle-crack-secret-key-change-in-production'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'hustle_crack.db')
+instance_dir = os.path.join(basedir, 'instance')
+os.makedirs(instance_dir, exist_ok=True)  # Ensure instance folder exists
+
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'hustle-crack-secret-key-change-in-production')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(instance_dir, 'hustle_crack.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'static', 'uploads')
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)  # Session timeout
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
 # Allowed extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf'}
@@ -62,9 +65,9 @@ def allowed_file(filename):
 
 
 def add_missing_columns():
-    """Add missing columns to existing tables without data loss"""
+    """Add missing columns to existing tables without data loss (Render safe)"""
     import sqlite3
-    db_path = os.path.join(basedir, 'hustle_crack.db')
+    db_path = os.path.join(instance_dir, 'hustle_crack.db')
     
     if not os.path.exists(db_path):
         return
@@ -109,14 +112,12 @@ def generate_student_id():
 
 
 def generate_token():
-    """Generate a unique token for test entries (e.g., TK-78X92)"""
     chars = string.ascii_uppercase + string.digits
     random_part = ''.join(random.choices(chars, k=6))
     return f"TK-{random_part}"
 
 
 def admin_required(f):
-    """Decorator to protect admin routes - redirects to login if not authenticated"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('admin_logged_in'):
@@ -127,26 +128,20 @@ def admin_required(f):
 
 
 # ---------------------------
-# Routes: Portal & Home
+# Routes (same as before, but using updated config)
 # ---------------------------
 @app.route('/')
 def index():
     return render_template('index.html')
 
-
 @app.route('/portal-choice')
 def portal_choice():
     return render_template('portal_choice.html')
 
-
-# ---------------------------
-# Student Dashboard & Actions
-# ---------------------------
 @app.route('/student/dashboard')
 def student_dashboard():
     students = Student.query.all()
     return render_template('student/dashboard.html', students=students)
-
 
 @app.route('/student/register', methods=['GET', 'POST'])
 def student_register():
@@ -187,7 +182,6 @@ def student_register():
     
     return render_template('student/register.html')
 
-
 @app.route('/student/marks-entry', methods=['GET', 'POST'])
 def marks_entry():
     if request.method == 'POST':
@@ -222,7 +216,6 @@ def marks_entry():
         return redirect(url_for('student_dashboard'))
     
     return render_template('student/marks_entry.html')
-
 
 @app.route('/student/pdf-upload', methods=['GET', 'POST'])
 def pdf_upload():
@@ -286,7 +279,6 @@ def pdf_upload():
     
     return render_template('student/pdf_upload.html')
 
-
 @app.route('/student/report-card')
 def report_card():
     student_id = request.args.get('student_id')
@@ -325,10 +317,6 @@ def report_card():
                           test_labels=test_labels,
                           test_scores=test_scores)
 
-
-# ---------------------------
-# Teacher Dashboard
-# ---------------------------
 @app.route('/teacher/dashboard')
 def teacher_dashboard():
     students = Student.query.all()
@@ -348,13 +336,9 @@ def teacher_dashboard():
         })
     return render_template('teacher/dashboard.html', students=student_performance)
 
-
-# ---------------------------
-# Admin Authentication & Dashboard
-# ---------------------------
+# Admin routes (same as before, but we keep them for completeness)
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
-    # If already logged in, redirect to dashboard
     if session.get('admin_logged_in'):
         return redirect(url_for('admin_dashboard'))
     
@@ -374,14 +358,12 @@ def admin_login():
     
     return render_template('admin/login.html')
 
-
 @app.route('/admin/logout')
 def admin_logout():
     session.pop('admin_logged_in', None)
     session.pop('admin_username', None)
     flash('Logged out.', 'info')
     return redirect(url_for('admin_login'))
-
 
 @app.route('/admin/dashboard')
 @admin_required
@@ -420,7 +402,6 @@ def admin_dashboard():
                           pending_reports=pending_reports,
                           students=student_data)
 
-
 @app.route('/admin/edit-marks', methods=['POST'])
 @admin_required
 def edit_marks():
@@ -435,14 +416,10 @@ def edit_marks():
         return jsonify({'success': True, 'remark': generate_remarks(new_percentage)})
     return jsonify({'success': False, 'error': 'No test found'}), 404
 
-
-# ---------------------------
-# Export Endpoints (Excel & PDF)
-# ---------------------------
+# Export endpoints
 @app.route('/admin/export/excel')
 @admin_required
 def export_excel():
-    """Export all student data to Excel file"""
     students = Student.query.all()
     data = []
     for s in students:
@@ -481,13 +458,10 @@ def export_excel():
     response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     return response
 
-
 @app.route('/admin/export/pdf')
 @admin_required
 def export_pdf():
-    """Export student summary to PDF"""
     students = Student.query.all()
-    
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
     elements = []
@@ -537,10 +511,7 @@ def export_pdf():
     response.headers['Content-Type'] = 'application/pdf'
     return response
 
-
-# ---------------------------
-# Error Handlers
-# ---------------------------
+# Error handlers
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
@@ -548,7 +519,6 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template('500.html'), 500
-
 
 # ---------------------------
 # Run App
