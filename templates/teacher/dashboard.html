@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Teacher Dashboard — Hustle & Crack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C96A;
+      --gold-dim: #7A5F28;
+      --ink: #0A0A0C;
+      --ink-2: #111116;
+      --surface: #14141A;
+      --glass: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(201, 168, 76, 0.22);
+      --text: #F0EDE6;
+      --text-muted: #8A8577;
+      --red-marquee: #D62828;
+      --marquee-bg: #1A0606;
+      --radius-card: 28px;
+      --shadow-deep: 0 25px 45px rgba(0, 0, 0, 0.6);
+      --font-display: 'Bebas Neue', 'Playfair Display', serif;
+      --font-body: 'DM Sans', 'Noto Sans Devanagari', sans-serif;
+    }
+
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      min-height: 100vh;
+    }
+
+    /* ---- MARQUEE (red alert) ---- */
+    .top-marquee {
+      background: var(--marquee-bg);
+      border-bottom: 2px solid var(--red-marquee);
+      overflow: hidden;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 110;
+    }
+    .marquee-content {
+      display: flex;
+      white-space: nowrap;
+      animation: scrollMarquee 30s linear infinite;
+    }
+    .marquee-content span {
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: #FF7B7B;
+      padding-right: 3rem;
+    }
+    @keyframes scrollMarquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* BG GRID & ORBS */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(201, 168, 76, 0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(201, 168, 76, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 520px;
+      height: 520px;
+      background: radial-gradient(circle, rgba(201, 168, 76, 0.1), transparent 70%);
+      top: -140px;
+      left: -100px;
+      animation: floatOrb 16s infinite alternate;
+    }
+    .orb-2 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(56, 130, 220, 0.08), transparent 70%);
+      bottom: -70px;
+      right: -50px;
+      animation: floatOrb 20s infinite alternate-reverse;
+    }
+    @keyframes floatOrb {
+      from { transform: translate(0, 0); }
+      to { transform: translate(35px, 30px); }
+    }
+
+    /* main container */
+    .teacher-container {
+      position: relative;
+      z-index: 2;
+      max-width: 1400px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem 2rem;
+    }
+
+    /* navigation */
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .back-btn {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 60px;
+      padding: 0.5rem 1.2rem;
+      color: var(--gold-dim);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+    .back-btn:hover {
+      background: rgba(201, 168, 76, 0.15);
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+    .brand-mini h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .brand-mini h2 span { color: var(--gold); }
+    .brand-mini p {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    /* Access Card (initial view) */
+    .access-card {
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-card);
+      padding: 2rem;
+      max-width: 550px;
+      margin: 2rem auto;
+      text-align: center;
+      box-shadow: var(--shadow-deep);
+      transition: all 0.3s;
+    }
+    .access-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .input-group {
+      margin-bottom: 1.2rem;
+      text-align: left;
+    }
+    .input-group label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold-dim);
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .input-group input, .input-group select {
+      width: 100%;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 14px;
+      padding: 0.7rem 1rem;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .input-group input:focus {
+      border-color: var(--gold);
+    }
+    .photo-upload-area {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .preview-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--gold-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .preview-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .verify-btn {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 40px;
+      font-weight: bold;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 100%;
+    }
+    .error-text {
+      color: #FF7B7B;
+      font-size: 0.7rem;
+      margin-top: 0.3rem;
+    }
+
+    /* Main Dashboard (hidden initially) */
+    .main-dashboard {
+      display: none;
+      animation: fadeUp 0.5s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* stats cards */
+    .insight-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .insight-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .insight-value {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--gold);
+    }
+
+    /* filter bar */
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .class-filter {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 40px;
+      padding: 0.4rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .class-filter select {
+      background: transparent;
+      border: none;
+      color: var(--gold);
+      outline: none;
+    }
+
+    /* table */
+    .table-wrapper {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--glass-border);
+      overflow-x: auto;
+      padding: 0.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    th, td {
+      padding: 0.8rem 0.6rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+    th {
+      color: var(--gold);
+    }
+    .badge-excellent {
+      background: rgba(76, 217, 138, 0.2);
+      color: #4CD98A;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+    }
+    .badge-warning {
+      background: rgba(255, 123, 123, 0.2);
+      color: #FF7B7B;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+    }
+    .footer-note {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+<div class="top-marquee">
+  <div class="marquee-content">
+    <span>👨‍🏫 TEACHER PORTAL — Monitoring student excellence and academic progress. 👨‍🏫 Access student data, marks & insights.</span>
+    <span>👨‍🏫 TEACHER PORTAL — Monitoring student excellence and academic progress. 👨‍🏫 Access student data, marks & insights.</span>
+  </div>
+</div>
+<div class="bg-grid"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<main class="teacher-container">
+  <div class="nav-row">
+    <a href="portal_choice.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Portal Selection</a>
+    <div class="brand-mini">
+      <h2>Hustle <span>&</span> Crack</h2>
+      <p>teacher command center</p>
+    </div>
+  </div>
+
+  <!-- ACCESS CARD (initial) -->
+  <div id="accessCard" class="access-card">
+    <div class="access-title"><i class="fas fa-chalkboard-user"></i> Teacher Verification</div>
+    <div class="input-group">
+      <label><i class="fas fa-user"></i> Teacher Name</label>
+      <input type="text" id="teacherName" placeholder="e.g. Mrs. Shweta Sharma">
+    </div>
+    <div class="input-group">
+      <label><i class="fas fa-book"></i> Subject</label>
+      <input type="text" id="subject" placeholder="e.g. Mathematics">
+    </div>
+    <div class="input-group">
+      <label><i class="fas fa-id-card"></i> Employee ID</label>
+      <input type="text" id="empId" placeholder="e.g. TCH-1001">
+    </div>
+    <div class="input-group">
+      <label><i class="fas fa-camera"></i> Upload Photo (Verification)</label>
+      <div class="photo-upload-area">
+        <div class="preview-circle" id="photoPreviewCircle">
+          <img id="teacherPhotoPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 24 24' fill='%238A8577'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="preview">
+        </div>
+        <input type="file" id="teacherPhotoUpload" accept="image/jpeg,image/png" style="font-size:0.7rem;">
+      </div>
+      <div class="error-text" id="accessError"></div>
+    </div>
+    <button class="verify-btn" id="verifyTeacherBtn"><i class="fas fa-eye"></i> View Reports</button>
+  </div>
+
+  <!-- MAIN DASHBOARD (hidden until verification) -->
+  <div id="mainDashboard" class="main-dashboard">
+    <!-- Performance Insights Cards -->
+    <div class="insight-cards">
+      <div class="insight-card"><div class="insight-value" id="excellentCount">0</div><div class="insight-label">Performing Well (≥75%)</div></div>
+      <div class="insight-card"><div class="insight-value" id="needHelpCount">0</div><div class="insight-label">Need Help (&lt;50%)</div></div>
+      <div class="insight-card"><div class="insight-value" id="avgClassPercent">0%</div><div class="insight-label">Class Average</div></div>
+    </div>
+
+    <!-- Filter by Class -->
+    <div class="filter-bar">
+      <div class="class-filter">
+        <i class="fas fa-filter"></i>
+        <select id="classFilterSelect">
+          <option value="all">All Classes</option>
+          <option value="Class 10">Class 10</option>
+          <option value="Class 11 Science">Class 11 Science</option>
+          <option value="Class 11 Commerce">Class 11 Commerce</option>
+          <option value="Class 12 Science">Class 12 Science</option>
+          <option value="Class 12 Commerce">Class 12 Commerce</option>
+        </select>
+      </div>
+      <div><i class="fas fa-chalkboard"></i> <span id="teacherSubjectDisplay">-</span> Teacher</div>
+    </div>
+
+    <!-- Student Overview Table -->
+    <div class="table-wrapper">
+      <table id="studentTable">
+        <thead>
+          <tr><th>Student ID</th><th>Name</th><th>Class</th><th>Overall %</th><th>Accuracy</th><th>Remark</th></tr>
+        </thead>
+        <tbody id="studentTableBody">
+          <!-- dynamic rows -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="footer-note">
+    <i class="fas fa-chart-line"></i> Real-time student progress · Data from registrations & assessments
+  </div>
+</main>
+
+<script>
+  // ---------- SECURITY: Disable right-click, inspect, drag, copy ----------
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    const blocked = [
+      e.ctrlKey && ['c','u','s','a','p'].includes(e.key.toLowerCase()),
+      e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase()),
+      e.key === 'F12'
+    ];
+    if (blocked.some(Boolean)) e.preventDefault();
+  });
+  document.querySelectorAll('img').forEach(img => {
+    img.addEventListener('dragstart', e => e.preventDefault());
+  });
+
+  // ---------- MOCK STUDENT DATA (combined from PDF/marks entries) ----------
+  let studentsData = [
+    { id: "HC-2401", name: "Aarav Sharma", class: "Class 12 Science", percentage: 84.5, accuracy: "87%" },
+    { id: "HC-2402", name: "Priya Singh", class: "Class 12 Science", percentage: 91.2, accuracy: "94%" },
+    { id: "HC-2403", name: "Rohan Verma", class: "Class 11 Commerce", percentage: 67.8, accuracy: "71%" },
+    { id: "HC-2404", name: "Anjali Kumari", class: "Class 11 Science", percentage: 79.3, accuracy: "82%" },
+    { id: "HC-2405", name: "Kunal Raj", class: "Class 10", percentage: 48.5, accuracy: "52%" },
+    { id: "HC-2406", name: "Sneha Gupta", class: "Class 12 Science", percentage: 95.0, accuracy: "98%" },
+    { id: "HC-2407", name: "Ritik Verma", class: "Class 10", percentage: 62.3, accuracy: "65%" },
+    { id: "HC-2408", name: "Neha Sinha", class: "Class 11 Commerce", percentage: 44.2, accuracy: "47%" }
+  ];
+
+  // Helper: get remark based on percentage
+  function getRemark(percent) {
+    if (percent >= 75) return "🌟 Excellent";
+    if (percent >= 60) return "✅ Good";
+    if (percent >= 50) return "📈 Average, can improve";
+    return "⚠️ Needs help";
+  }
+
+  // Render table with class filter
+  let currentFilter = "all";
+  function renderTable() {
+    const tbody = document.getElementById('studentTableBody');
+    const filtered = currentFilter === "all" ? studentsData : studentsData.filter(s => s.class === currentFilter);
+    tbody.innerHTML = "";
+    filtered.forEach(student => {
+      const remark = getRemark(student.percentage);
+      const row = tbody.insertRow();
+      row.innerHTML = `
+        <td>${student.id}</td>
+        <td>${student.name}</td>
+        <td>${student.class}</td>
+        <td>${student.percentage}%</td>
+        <td>${student.accuracy}</td>
+        <td><span class="${student.percentage >= 75 ? 'badge-excellent' : (student.percentage < 50 ? 'badge-warning' : '')}" style="padding:0.2rem 0.6rem; border-radius:20px;">${remark}</span></td>
+      `;
+    });
+    updateInsights();
+  }
+
+  // Update insight cards (excellent, need help, average)
+  function updateInsights() {
+    const filtered = currentFilter === "all" ? studentsData : studentsData.filter(s => s.class === currentFilter);
+    const excellent = filtered.filter(s => s.percentage >= 75).length;
+    const needHelp = filtered.filter(s => s.percentage < 50).length;
+    const avg = filtered.reduce((sum, s) => sum + s.percentage, 0) / (filtered.length || 1);
+    document.getElementById('excellentCount').innerText = excellent;
+    document.getElementById('needHelpCount').innerText = needHelp;
+    document.getElementById('avgClassPercent').innerText = avg.toFixed(1) + "%";
+  }
+
+  // Filter change listener
+  document.getElementById('classFilterSelect').addEventListener('change', (e) => {
+    currentFilter = e.target.value;
+    renderTable();
+  });
+
+  // ---------- ACCESS CONTROL LOGIC ----------
+  const accessCard = document.getElementById('accessCard');
+  const mainDashboard = document.getElementById('mainDashboard');
+  const verifyBtn = document.getElementById('verifyTeacherBtn');
+  const teacherNameInput = document.getElementById('teacherName');
+  const subjectInput = document.getElementById('subject');
+  const empIdInput = document.getElementById('empId');
+  const accessError = document.getElementById('accessError');
+  const teacherPhotoUpload = document.getElementById('teacherPhotoUpload');
+  const teacherPhotoPreview = document.getElementById('teacherPhotoPreview');
+  const teacherSubjectDisplay = document.getElementById('teacherSubjectDisplay');
+  let teacherPhotoData = null;
+
+  // Preview photo
+  teacherPhotoUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file && (file.type === 'image/jpeg' || file.type === 'image/png')) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        teacherPhotoPreview.src = ev.target.result;
+        teacherPhotoData = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else if (file) {
+      accessError.innerText = "Only JPG/PNG allowed for photo.";
+      teacherPhotoPreview.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 24 24' fill='%238A8577'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
+      teacherPhotoData = null;
+    }
+  });
+
+  verifyBtn.addEventListener('click', () => {
+    const teacherName = teacherNameInput.value.trim();
+    const subject = subjectInput.value.trim();
+    const empId = empIdInput.value.trim();
+    if (!teacherName) { accessError.innerText = "Teacher Name required"; return; }
+    if (!subject) { accessError.innerText = "Subject required"; return; }
+    if (!empId) { accessError.innerText = "Employee ID required"; return; }
+    if (!teacherPhotoData) { accessError.innerText = "Please upload a photo for verification"; return; }
+    accessError.innerText = "";
+    // Store teacher info for display
+    teacherSubjectDisplay.innerText = `${teacherName} (${subject})`;
+    // Hide access card, show dashboard
+    accessCard.style.display = "none";
+    mainDashboard.style.display = "block";
+    // initial render of table
+    renderTable();
+  });
+
+  // optional: if user wants to re-verify, but we just hide card permanently. fine.
+  // also ensure that back button works (portal_choice.html assumed exists)
+</script>
+</body>
+</html>

@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Smart PDF Analysis — Hustle & Crack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C96A;
+      --gold-dim: #7A5F28;
+      --ink: #0A0A0C;
+      --ink-2: #111116;
+      --surface: #14141A;
+      --glass: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(201, 168, 76, 0.22);
+      --text: #F0EDE6;
+      --text-muted: #8A8577;
+      --red-marquee: #D62828;
+      --marquee-bg: #1A0606;
+      --radius-card: 28px;
+      --radius-modal: 32px;
+      --shadow-deep: 0 25px 45px rgba(0, 0, 0, 0.6);
+      --font-display: 'Bebas Neue', 'Playfair Display', serif;
+      --font-body: 'DM Sans', 'Noto Sans Devanagari', sans-serif;
+    }
+
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      min-height: 100vh;
+    }
+
+    /* MARQUEE (red alert) */
+    .top-marquee {
+      background: var(--marquee-bg);
+      border-bottom: 2px solid var(--red-marquee);
+      overflow: hidden;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 110;
+    }
+    .marquee-content {
+      display: flex;
+      white-space: nowrap;
+      animation: scrollMarquee 28s linear infinite;
+    }
+    .marquee-content span {
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: #FF7B7B;
+      padding-right: 3rem;
+    }
+    @keyframes scrollMarquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* BACKGROUND GRID + ORBS */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(201, 168, 76, 0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(201, 168, 76, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 520px;
+      height: 520px;
+      background: radial-gradient(circle, rgba(201, 168, 76, 0.1), transparent 70%);
+      top: -140px;
+      left: -100px;
+      animation: floatOrb 16s infinite alternate;
+    }
+    .orb-2 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(80, 150, 240, 0.08), transparent 70%);
+      bottom: -70px;
+      right: -50px;
+      animation: floatOrb 20s infinite alternate-reverse;
+    }
+    @keyframes floatOrb {
+      from { transform: translate(0, 0); }
+      to { transform: translate(35px, 30px); }
+    }
+
+    /* MAIN CONTAINER */
+    .pdf-container {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem 1.5rem 2rem;
+    }
+
+    /* navigation & back button */
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .back-btn {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 60px;
+      padding: 0.5rem 1.2rem;
+      color: var(--gold-dim);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+    .back-btn:hover {
+      background: rgba(201, 168, 76, 0.15);
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+    .brand-mini h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .brand-mini h2 span { color: var(--gold); }
+    .brand-mini p {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    /* MAIN CARD */
+    .glass-card {
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-card);
+      padding: 2rem 2rem 2rem;
+      box-shadow: var(--shadow-deep);
+    }
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .card-title i {
+      color: var(--gold);
+      margin-right: 10px;
+    }
+
+    /* input group */
+    .input-group {
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .input-group label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold-dim);
+      font-weight: 600;
+    }
+    .input-group input {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      border-radius: 14px;
+      padding: 0.8rem 1rem;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      outline: none;
+      transition: 0.2s;
+    }
+    .input-group input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.2);
+    }
+
+    /* Drag & Drop Zone */
+    .upload-area {
+      border: 2px dashed rgba(201, 168, 76, 0.5);
+      border-radius: 24px;
+      padding: 2rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      background: rgba(0, 0, 0, 0.3);
+      margin-bottom: 0.5rem;
+    }
+    .upload-area.drag-over {
+      border-color: var(--gold);
+      background: rgba(201, 168, 76, 0.08);
+      transform: scale(0.99);
+    }
+    .upload-icon {
+      font-size: 2.8rem;
+      color: var(--gold-dim);
+      margin-bottom: 0.6rem;
+    }
+    .upload-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .file-name {
+      font-size: 0.75rem;
+      color: var(--gold);
+      margin-top: 8px;
+      font-weight: 500;
+    }
+    .file-error {
+      color: #FF7B7B;
+      font-size: 0.7rem;
+      margin-top: 6px;
+    }
+    input[type="file"] {
+      display: none;
+    }
+
+    /* action button */
+    .analyze-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border: none;
+      padding: 0.9rem;
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      letter-spacing: 0.1em;
+      color: var(--ink);
+      border-radius: 50px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    .analyze-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .analyze-btn:hover:not(:disabled) {
+      opacity: 0.92;
+      transform: scale(0.99);
+    }
+
+    /* LOADING SPINNER */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0.2s, opacity 0.2s;
+    }
+    .loading-overlay.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .loading-card {
+      background: #13131C;
+      border: 1px solid rgba(201, 168, 76, 0.4);
+      border-radius: 40px;
+      padding: 2rem 2.5rem;
+      text-align: center;
+      min-width: 280px;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(201, 168, 76, 0.2);
+      border-top: 4px solid var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loading-text {
+      color: var(--gold-light);
+      font-size: 0.9rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* SUCCESS MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0.2s, opacity 0.25s ease;
+    }
+    .modal-overlay.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-card {
+      background: #13131C;
+      border: 1px solid rgba(201, 168, 76, 0.45);
+      border-radius: var(--radius-modal);
+      max-width: 500px;
+      width: 90%;
+      padding: 2rem 1.8rem;
+      transform: scale(0.96);
+      transition: transform 0.25s ease;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+    }
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+    .modal-icon {
+      font-size: 2.8rem;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .modal-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.9rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .result-table {
+      width: 100%;
+      margin: 1rem 0;
+      border-collapse: collapse;
+      background: rgba(0,0,0,0.4);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .result-table td, .result-table th {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(201,168,76,0.2);
+      text-align: left;
+    }
+    .result-table tr:last-child td {
+      border-bottom: none;
+    }
+    .result-table th {
+      color: var(--gold);
+      font-weight: 500;
+      width: 40%;
+    }
+    .token-badge {
+      background: rgba(201, 168, 76, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 60px;
+      font-family: monospace;
+      font-size: 1.1rem;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      text-align: center;
+      margin: 0.8rem 0;
+      border: 1px solid var(--gold-dim);
+    }
+    .modal-close {
+      background: var(--gold);
+      border: none;
+      padding: 0.6rem 1.5rem;
+      border-radius: 40px;
+      font-weight: bold;
+      font-family: var(--font-body);
+      cursor: pointer;
+      width: 100%;
+      transition: 0.2s;
+      margin-top: 0.8rem;
+    }
+    .privacy-note {
+      margin-top: 1.5rem;
+      font-size: 0.7rem;
+      text-align: center;
+      color: var(--text-muted);
+      background: rgba(0,0,0,0.3);
+      padding: 0.6rem;
+      border-radius: 20px;
+    }
+    .privacy-note i {
+      color: var(--gold-dim);
+      margin-right: 5px;
+    }
+    hr {
+      border-color: rgba(201,168,76,0.2);
+      margin: 0.8rem 0;
+    }
+    .footer-note {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-marquee">
+  <div class="marquee-content">
+    <span>📄 PDF ANALYSIS SYSTEM — Upload your exam result for automatic report generation. 📄 Secure & local processing — no file storage. 📄</span>
+    <span>📄 PDF ANALYSIS SYSTEM — Upload your exam result for automatic report generation. 📄 Secure & local processing — no file storage. 📄</span>
+  </div>
+</div>
+
+<div class="bg-grid"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<main class="pdf-container">
+  <div class="nav-row">
+    <a href="student_dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    <div class="brand-mini">
+      <h2>Hustle <span>&</span> Crack</h2>
+      <p>smart pdf analysis</p>
+    </div>
+  </div>
+
+  <div class="glass-card">
+    <div class="card-title">
+      <i class="fas fa-file-pdf"></i> PDF Exam Analyzer
+    </div>
+
+    <!-- Student ID Field -->
+    <div class="input-group">
+      <label><i class="fas fa-id-badge"></i> Student ID / Roll Number</label>
+      <input type="text" id="studentId" placeholder="e.g. HC-2412-09 or Roll: 2024CS01" required>
+    </div>
+
+    <!-- Drag & Drop Zone -->
+    <div class="upload-area" id="dropZone">
+      <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+      <div class="upload-text">Drag & Drop PDF here or <strong style="color:var(--gold)">click to browse</strong></div>
+      <div class="file-name" id="fileNameDisplay">No file chosen</div>
+      <div class="file-error" id="fileError"></div>
+      <input type="file" id="pdfInput" accept=".pdf" />
+    </div>
+
+    <button class="analyze-btn" id="analyzeBtn">Analyze Result <i class="fas fa-microchip"></i></button>
+
+    <div class="privacy-note">
+      <i class="fas fa-shield-alt"></i> <strong>Privacy Alert:</strong> Your PDF is processed locally and deleted immediately after data extraction. We do not store student result files.
+    </div>
+  </div>
+  <div class="footer-note">
+    <i class="fas fa-lock"></i> End-to-end local simulation · No server upload
+  </div>
+</main>
+
+<!-- LOADING SPINNER OVERLAY -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-card">
+    <div class="spinner"></div>
+    <div class="loading-text"><i class="fas fa-brain"></i> Reading PDF data... <br> Extracting Marks, Accuracy, and Time Metrics.</div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL (extracted data + token) -->
+<div id="resultModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-icon"><i class="fas fa-chart-line"></i></div>
+    <h3>✅ Analysis Complete</h3>
+    <table class="result-table">
+      <tbody>
+        <tr><th>📊 Marks</th><td id="modalMarks">--</td></tr>
+        <tr><th>🏅 Grade</th><td id="modalGrade">--</td></tr>
+        <tr><th>🎯 Accuracy</th><td id="modalAccuracy">--</td></tr>
+        <tr><th>⏱️ Time Used</th><td id="modalTime">--</td></tr>
+      </tbody>
+    </table>
+    <div style="text-align:center; font-size:0.7rem; margin-top: 0.2rem;">Unique Token</div>
+    <div class="token-badge" id="modalToken">PDF-XXXXX</div>
+    <hr />
+    <button class="modal-close" id="closeResultModal">Close & Continue</button>
+  </div>
+</div>
+
+<script>
+  // ---------- PROTECTION (right-click / inspect / drag images) ----------
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    const blocked = [
+      e.ctrlKey && ['c','u','s','a','p'].includes(e.key.toLowerCase()),
+      e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase()),
+      e.key === 'F12'
+    ];
+    if (blocked.some(Boolean)) e.preventDefault();
+  });
+  document.querySelectorAll('img').forEach(img => {
+    img.addEventListener('dragstart', e => e.preventDefault());
+    img.addEventListener('mousedown', e => { if (e.button === 2) e.preventDefault(); });
+  });
+
+  // DOM elements
+  const dropZone = document.getElementById('dropZone');
+  const pdfInput = document.getElementById('pdfInput');
+  const fileNameDisplay = document.getElementById('fileNameDisplay');
+  const fileError = document.getElementById('fileError');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const studentIdInput = document.getElementById('studentId');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const resultModal = document.getElementById('resultModal');
+  const closeModalBtn = document.getElementById('closeResultModal');
+
+  let selectedFile = null;
+
+  // Helper: validate PDF
+  function validatePDF(file) {
+    if (!file) return false;
+    if (file.type !== 'application/pdf') {
+      fileError.innerText = '❌ Only PDF files are allowed.';
+      return false;
+    }
+    fileError.innerText = '';
+    return true;
+  }
+
+  // Update UI after file selection
+  function handleFileSelection(file) {
+    if (file && validatePDF(file)) {
+      selectedFile = file;
+      fileNameDisplay.innerText = `📄 ${file.name}`;
+      fileNameDisplay.style.color = 'var(--gold)';
+    } else if (file && !validatePDF(file)) {
+      selectedFile = null;
+      fileNameDisplay.innerText = 'No file chosen';
+      fileNameDisplay.style.color = 'var(--text-muted)';
+    } else {
+      selectedFile = null;
+      fileNameDisplay.innerText = 'No file chosen';
+      fileNameDisplay.style.color = 'var(--text-muted)';
+    }
+  }
+
+  // Drag & Drop events
+  dropZone.addEventListener('click', () => pdfInput.click());
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+  });
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('drag-over');
+  });
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      pdfInput.files = files; // sync input
+      handleFileSelection(file);
+    }
+  });
+
+  pdfInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      handleFileSelection(e.target.files[0]);
+    } else {
+      handleFileSelection(null);
+    }
+  });
+
+  // ----- RANDOM TOKEN GENERATOR (PDF-XXXXX style) -----
+  function generatePdfToken() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+    let randomPart = '';
+    for (let i = 0; i < 6; i++) {
+      randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return `PDF-${randomPart}`;
+  }
+
+  // ----- SIMULATE EXTRACTION from PDF (mock data but realistic values) -----
+  function simulateExtraction() {
+    // generate random but plausible marks, grade, accuracy, time
+    const marksObtained = Math.floor(Math.random() * (95 - 45 + 1) + 45); // 45 to 95
+    const totalMarks = 100;
+    const marksStr = `${marksObtained} / ${totalMarks}`;
+    let grade = '';
+    if (marksObtained >= 90) grade = 'A+ (Excellent)';
+    else if (marksObtained >= 75) grade = 'A (Very Good)';
+    else if (marksObtained >= 60) grade = 'B+ (Good)';
+    else if (marksObtained >= 45) grade = 'C (Average)';
+    else grade = 'D (Needs Improvement)';
+    
+    const accuracy = Math.floor((marksObtained / totalMarks) * 100);
+    const accuracyStr = `${accuracy}%`;
+    const timeMinutes = Math.floor(Math.random() * (55 - 25 + 1) + 25);
+    const timeStr = `${timeMinutes} min ${Math.floor(Math.random() * 59)} sec`;
+    
+    return { marks: marksStr, grade, accuracy: accuracyStr, timeUsed: timeStr };
+  }
+
+  // show loading for 3 sec then modal
+  function startAnalysis() {
+    // validation: student ID + PDF must be selected
+    const studentId = studentIdInput.value.trim();
+    if (!studentId) {
+      alert('❌ Please enter Student ID / Roll Number');
+      return false;
+    }
+    if (!selectedFile) {
+      fileError.innerText = '❌ Please select a valid PDF file.';
+      return false;
+    }
+    fileError.innerText = '';
+    
+    // Show loading overlay
+    loadingOverlay.classList.add('active');
+    
+    // Simulate PDF processing delay 3 seconds
+    setTimeout(() => {
+      // hide loading
+      loadingOverlay.classList.remove('active');
+      
+      // Extract simulated data
+      const extracted = simulateExtraction();
+      const token = generatePdfToken();
+      
+      // Fill modal with extracted info
+      document.getElementById('modalMarks').innerText = extracted.marks;
+      document.getElementById('modalGrade').innerText = extracted.grade;
+      document.getElementById('modalAccuracy').innerText = extracted.accuracy;
+      document.getElementById('modalTime').innerText = extracted.timeUsed;
+      document.getElementById('modalToken').innerText = token;
+      
+      // (optional) store a log in localStorage for audit trail
+      const analysisRecord = {
+        studentId: studentId,
+        fileName: selectedFile.name,
+        marks: extracted.marks,
+        grade: extracted.grade,
+        accuracy: extracted.accuracy,
+        timeUsed: extracted.timeUsed,
+        token: token,
+        timestamp: new Date().toISOString()
+      };
+      let history = JSON.parse(localStorage.getItem('hustlePdfAnalysis') || '[]');
+      history.push(analysisRecord);
+      localStorage.setItem('hustlePdfAnalysis', JSON.stringify(history));
+      
+      // show success modal
+      resultModal.classList.add('active');
+      
+      // after modal closed, we optionally reset file selection (privacy: clear local file reference)
+      // but do NOT store file itself, just mock data.
+      // we also clear the selected file to simulate "deleted immediately"
+      selectedFile = null;
+      pdfInput.value = '';
+      fileNameDisplay.innerText = 'No file chosen';
+      fileNameDisplay.style.color = 'var(--text-muted)';
+      fileError.innerText = '';
+    }, 3000);
+    
+    return true;
+  }
+  
+  analyzeBtn.addEventListener('click', startAnalysis);
+  
+  // close modal and optionally reset form (but keep student ID maybe)
+  function closeModalAndReset() {
+    resultModal.classList.remove('active');
+    // student id remains but file already cleared; optionally clear student id?
+    // we keep it for convenience, but user may re-upload.
+    // no forced reset, but file zone already cleared after analysis.
+  }
+  closeModalBtn.addEventListener('click', closeModalAndReset);
+  // click outside modal to close
+  resultModal.addEventListener('click', (e) => {
+    if (e.target === resultModal) closeModalAndReset();
+  });
+  
+  // additional protection for text selection inside cards
+  document.querySelectorAll('.glass-card, .modal-card, .upload-area').forEach(el => {
+    el.addEventListener('selectstart', e => e.preventDefault());
+  });
+  
+  // Disable analyzing if no PDF selected on the fly (optional UI)
+  function updateAnalyzeButton() {
+    // just style hint
+  }
+  pdfInput.addEventListener('change', updateAnalyzeButton);
+  dropZone.addEventListener('drop', () => setTimeout(updateAnalyzeButton, 50));
+</script>
+</body>
+</html>

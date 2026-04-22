@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error — Hustle & Crack{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="text-align: center; max-width: 600px; margin: 3rem auto;">
+    <div style="font-size: 5rem; color: var(--gold);">500</div>
+    <h2 style="font-family: var(--font-display); margin: 1rem 0;">Internal Server Error</h2>
+    <p>Something went wrong on our end. Please try again later.</p>
+    <a href="{{ url_for('index') }}" class="btn-gold" style="display: inline-block; margin-top: 1.5rem;">
+        <i class="fas fa-home"></i> Return Home
+    </a>
+</div>
+{% endblock %}

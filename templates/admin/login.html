@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login — Hustle & Crack{% endblock %}
+
+{% block styles %}
+<style>
+  /* Additional login-specific styles */
+  .login-container {
+    max-width: 450px;
+    margin: 3rem auto;
+  }
+
+  .login-card {
+    background: var(--glass);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-card);
+    padding: 2rem 2rem 2.2rem;
+    box-shadow: var(--shadow-deep);
+    text-align: center;
+  }
+
+  .login-icon {
+    font-size: 3.5rem;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+
+  .login-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    margin-bottom: 1.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  .input-group {
+    margin-bottom: 1.2rem;
+    text-align: left;
+  }
+
+  .input-group label {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gold-dim);
+    margin-bottom: 0.4rem;
+  }
+
+  .input-group input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    border-radius: 14px;
+    padding: 0.8rem 1rem;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    outline: none;
+    transition: 0.2s;
+  }
+
+  .input-group input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.2);
+  }
+
+  .login-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border: none;
+    padding: 0.8rem;
+    border-radius: 50px;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--ink);
+    cursor: pointer;
+    transition: 0.2s;
+    margin-top: 0.5rem;
+  }
+
+  .login-btn:hover {
+    opacity: 0.92;
+    transform: scale(0.98);
+  }
+
+  .flash-messages {
+    margin-bottom: 1rem;
+  }
+
+  .flash-message {
+    background: rgba(214, 40, 40, 0.15);
+    border-left: 3px solid #D62828;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    margin-bottom: 0.6rem;
+    text-align: left;
+  }
+
+  .flash-message.success {
+    background: rgba(76, 217, 138, 0.15);
+    border-left-color: #4CD98A;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 1.2rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: 0.2s;
+  }
+
+  .back-link:hover {
+    color: var(--gold);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-icon">
+      <i class="fas fa-shield-alt"></i>
+    </div>
+    <h2 class="login-title">Admin Access</h2>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Login Form -->
+    <form method="POST" action="{{ url_for('admin_login') }}">
+      <div class="input-group">
+        <label><i class="fas fa-user"></i> Username</label>
+        <input type="text" name="username" placeholder="Enter admin username" required autofocus>
+      </div>
+      <div class="input-group">
+        <label><i class="fas fa-lock"></i> Password</label>
+        <input type="password" name="password" placeholder="Enter password" required>
+      </div>
+      <button type="submit" class="login-btn">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+    </form>
+
+    <a href="{{ url_for('portal_choice') }}" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Portal Selection
+    </a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Marks Entry — Hustle & Crack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C96A;
+      --gold-dim: #7A5F28;
+      --ink: #0A0A0C;
+      --ink-2: #111116;
+      --surface: #14141A;
+      --glass: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(201, 168, 76, 0.2);
+      --text: #F0EDE6;
+      --text-muted: #8A8577;
+      --red-marquee: #D62828;
+      --marquee-bg: #1A0606;
+      --radius-card: 28px;
+      --radius-modal: 28px;
+      --shadow-deep: 0 25px 45px rgba(0, 0, 0, 0.6);
+      --font-display: 'Bebas Neue', 'Playfair Display', serif;
+      --font-body: 'DM Sans', 'Noto Sans Devanagari', sans-serif;
+    }
+
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      min-height: 100vh;
+    }
+
+    /* ---- MARQUEE (premium red alert) ---- */
+    .top-marquee {
+      background: var(--marquee-bg);
+      border-bottom: 2px solid var(--red-marquee);
+      overflow: hidden;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 110;
+    }
+    .marquee-content {
+      display: flex;
+      white-space: nowrap;
+      animation: scrollMarquee 30s linear infinite;
+    }
+    .marquee-content span {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: #FF7B7B;
+      padding-right: 3rem;
+    }
+    @keyframes scrollMarquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ---- BG GRID & ORBS (signature) ---- */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(201, 168, 76, 0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(201, 168, 76, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(201, 168, 76, 0.1), transparent 70%);
+      top: -120px;
+      left: -80px;
+      animation: floatOrb 14s infinite alternate;
+    }
+    .orb-2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(56, 130, 220, 0.08), transparent 70%);
+      bottom: -60px;
+      right: -40px;
+      animation: floatOrb 18s infinite alternate-reverse;
+    }
+    @keyframes floatOrb {
+      from { transform: translate(0, 0); }
+      to { transform: translate(35px, 30px); }
+    }
+
+    /* main container */
+    .marks-container {
+      position: relative;
+      z-index: 2;
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 1rem 1.5rem 2rem;
+    }
+
+    /* navigation & back button */
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .back-btn {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 60px;
+      padding: 0.5rem 1.2rem;
+      color: var(--gold-dim);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+    .back-btn:hover {
+      background: rgba(201, 168, 76, 0.15);
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+    .brand-mini h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .brand-mini h2 span { color: var(--gold); }
+    .brand-mini p {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    /* glass form card */
+    .form-card {
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-card);
+      padding: 2rem 2rem 2.2rem;
+      box-shadow: var(--shadow-deep);
+      transition: 0.2s;
+    }
+    .form-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 1.8rem;
+      letter-spacing: 0.04em;
+    }
+    .form-title i {
+      color: var(--gold);
+      margin-right: 8px;
+    }
+    .input-group {
+      margin-bottom: 1.3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .input-group label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold-dim);
+      font-weight: 600;
+    }
+    .input-group label i {
+      width: 24px;
+      color: var(--gold);
+    }
+    .input-group input, .input-group select {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      border-radius: 14px;
+      padding: 0.8rem 1rem;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      outline: none;
+      transition: 0.2s;
+    }
+    .input-group input:focus, .input-group select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.2);
+    }
+    .inline-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .error-text {
+      font-size: 0.7rem;
+      color: #FF7B7B;
+      margin-top: 0.2rem;
+    }
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border: none;
+      padding: 0.9rem;
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      letter-spacing: 0.1em;
+      color: var(--ink);
+      border-radius: 50px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    .submit-btn:hover {
+      opacity: 0.92;
+      transform: scale(0.99);
+    }
+    .footer-note {
+      text-align: center;
+      margin-top: 1.8rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* SUCCESS MODAL (custom popup) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0.2s, opacity 0.25s ease;
+    }
+    .modal-overlay.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-card {
+      background: #13131C;
+      border: 1px solid rgba(201, 168, 76, 0.4);
+      border-radius: var(--radius-modal);
+      max-width: 400px;
+      width: 85%;
+      text-align: center;
+      padding: 2rem 1.5rem;
+      transform: scale(0.96);
+      transition: transform 0.25s ease;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+    }
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+    .modal-icon {
+      font-size: 3rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    .modal-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.9rem;
+      margin-bottom: 0.5rem;
+    }
+    .token-badge {
+      background: rgba(201, 168, 76, 0.2);
+      padding: 0.6rem 1rem;
+      border-radius: 60px;
+      font-family: monospace;
+      font-size: 1.3rem;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      margin: 1rem 0;
+      display: inline-block;
+      border: 1px solid var(--gold-dim);
+    }
+    .modal-close {
+      background: var(--gold);
+      border: none;
+      padding: 0.6rem 1.8rem;
+      border-radius: 40px;
+      font-weight: bold;
+      font-family: var(--font-body);
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: 0.2s;
+    }
+    .modal-close:hover {
+      background: var(--gold-light);
+    }
+    hr {
+      border-color: rgba(201,168,76,0.2);
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-marquee">
+  <div class="marquee-content">
+    <span>📋 CLASS TEST MARKS ENTRY · Ensure accurate marks · Unique token generated for each submission · 📋</span>
+    <span>📋 CLASS TEST MARKS ENTRY · Ensure accurate marks · Unique token generated for each submission · 📋</span>
+  </div>
+</div>
+
+<div class="bg-grid"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<main class="marks-container">
+  <div class="nav-row">
+    <a href="student_dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    <div class="brand-mini">
+      <h2>Hustle <span>&</span> Crack</h2>
+      <p>marks entry portal</p>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-title">
+      <i class="fas fa-pen-alt"></i> Class Test Marks
+    </div>
+    <form id="marksForm">
+      <div class="input-group">
+        <label><i class="fas fa-id-card"></i> Student ID / Roll Number *</label>
+        <input type="text" id="studentRoll" placeholder="e.g. HC-2412-09 or Roll: 101" required>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-chalkboard-user"></i> Teacher Name *</label>
+        <input type="text" id="teacherName" placeholder="Mr./Ms. Teacher's full name" required>
+      </div>
+
+      <div class="input-group">
+        <label><i class="fas fa-book"></i> Subject *</label>
+        <select id="subject" required>
+          <option value="">-- Select Subject --</option>
+          <option>Physics</option><option>Mathematics</option><option>Biology</option>
+          <option>Chemistry</option><option>English</option><option>Civics</option>
+        </select>
+      </div>
+
+      <div class="inline-row">
+        <div class="input-group">
+          <label><i class="fas fa-star-of-life"></i> Total Marks *</label>
+          <input type="number" id="totalMarks" placeholder="e.g. 50" min="1" step="1" required>
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-check-circle"></i> Obtained Marks *</label>
+          <input type="number" id="obtainedMarks" placeholder="e.g. 42" min="0" step="1" required>
+        </div>
+      </div>
+
+      <div id="formError" class="error-text" style="text-align:center; margin-top: 0.2rem;"></div>
+      <button type="submit" class="submit-btn"><i class="fas fa-key"></i> Generate Token & Submit</button>
+    </form>
+  </div>
+  <div class="footer-note">
+    <i class="fas fa-lock"></i> Secure entry · Each submission generates a unique token for reference
+  </div>
+</main>
+
+<!-- SUCCESS MODAL (token popup) -->
+<div id="tokenModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-icon"><i class="fas fa-check-circle"></i></div>
+    <h3>Marks Submitted</h3>
+    <p>Your unique token number</p>
+    <div class="token-badge" id="tokenValue">TK-XXXXX</div>
+    <p style="font-size: 0.75rem; color: var(--text-muted);">Use this token for future reference.</p>
+    <hr />
+    <button class="modal-close" id="closeModalBtn">OK</button>
+  </div>
+</div>
+
+<script>
+  // ---------- DISABLE RIGHT-CLICK, DRAG, PROTECTION (premium) ----------
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    const blocked = [
+      e.ctrlKey && ['c','u','s','a','p'].includes(e.key.toLowerCase()),
+      e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase()),
+      e.key === 'F12'
+    ];
+    if (blocked.some(Boolean)) e.preventDefault();
+  });
+  document.querySelectorAll('img').forEach(img => {
+    img.addEventListener('dragstart', e => e.preventDefault());
+    img.addEventListener('mousedown', e => { if (e.button === 2) e.preventDefault(); });
+  });
+
+  // ----- Random Token Generator (TK-78X92 style) -----
+  function generateToken() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+    let randomPart = '';
+    for (let i = 0; i < 5; i++) {
+      randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return `TK-${randomPart}`;
+  }
+
+  // DOM elements
+  const form = document.getElementById('marksForm');
+  const studentRoll = document.getElementById('studentRoll');
+  const teacherName = document.getElementById('teacherName');
+  const subject = document.getElementById('subject');
+  const totalMarks = document.getElementById('totalMarks');
+  const obtainedMarks = document.getElementById('obtainedMarks');
+  const formErrorDiv = document.getElementById('formError');
+  const modal = document.getElementById('tokenModal');
+  const tokenSpan = document.getElementById('tokenValue');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+
+  // show modal with token
+  function showSuccessModal(token) {
+    tokenSpan.innerText = token;
+    modal.classList.add('active');
+  }
+
+  function closeModal() {
+    modal.classList.remove('active');
+  }
+
+  closeModalBtn.addEventListener('click', closeModal);
+  // close when clicking outside modal overlay
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // clear previous error
+  function clearError() {
+    formErrorDiv.innerText = '';
+  }
+
+  // validation and submit
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    clearError();
+
+    // get values
+    const rollVal = studentRoll.value.trim();
+    const teacherVal = teacherName.value.trim();
+    const subjectVal = subject.value;
+    const totalVal = parseFloat(totalMarks.value);
+    const obtainedVal = parseFloat(obtainedMarks.value);
+
+    if (!rollVal) {
+      formErrorDiv.innerText = '❌ Student ID / Roll Number is required';
+      return;
+    }
+    if (!teacherVal) {
+      formErrorDiv.innerText = '❌ Teacher name is required';
+      return;
+    }
+    if (!subjectVal) {
+      formErrorDiv.innerText = '❌ Please select a subject';
+      return;
+    }
+    if (isNaN(totalVal) || totalVal <= 0) {
+      formErrorDiv.innerText = '❌ Total marks must be a positive number';
+      return;
+    }
+    if (isNaN(obtainedVal) || obtainedVal < 0) {
+      formErrorDiv.innerText = '❌ Obtained marks must be 0 or greater';
+      return;
+    }
+    if (obtainedVal > totalVal) {
+      formErrorDiv.innerText = `⚠️ Obtained marks (${obtainedVal}) cannot exceed Total marks (${totalVal})`;
+      return;
+    }
+
+    // all valid => generate unique token
+    const newToken = generateToken();
+
+    // (optional) store in localStorage as record for demo
+    const entryRecord = {
+      token: newToken,
+      studentId: rollVal,
+      teacher: teacherVal,
+      subject: subjectVal,
+      totalMarks: totalVal,
+      obtained: obtainedVal,
+      timestamp: new Date().toISOString()
+    };
+    let marksHistory = JSON.parse(localStorage.getItem('hustleMarksEntries') || '[]');
+    marksHistory.push(entryRecord);
+    localStorage.setItem('hustleMarksEntries', JSON.stringify(marksHistory));
+
+    // show success modal with token
+    showSuccessModal(newToken);
+
+    // reset form fields (optional, but keep data optional)
+    // we reset after closing modal? better to reset after user clicks OK on modal but keep UX smooth.
+    // we will reset on modal close to give them fresh form.
+    function resetFormFields() {
+      studentRoll.value = '';
+      teacherName.value = '';
+      subject.value = '';
+      totalMarks.value = '';
+      obtainedMarks.value = '';
+      formErrorDiv.innerText = '';
+    }
+    // Attach reset once modal closed, but also if they open again we want fresh state
+    const originalCloseHandler = closeModalBtn.onclick;
+    const newCloseHandler = () => {
+      closeModal();
+      resetFormFields();
+    };
+    // replace event listeners: remove old, attach new with reset
+    closeModalBtn.removeEventListener('click', closeModal);
+    closeModalBtn.addEventListener('click', newCloseHandler);
+    // also for backdrop click reset?
+    const backdropHandler = (ev) => {
+      if (ev.target === modal) {
+        closeModal();
+        resetFormFields();
+      }
+    };
+    modal.removeEventListener('click', modal.click);
+    modal.addEventListener('click', backdropHandler);
+    // but we must avoid duplicate reset, we handle carefully.
+    // store references to not cause double reset
+    window._resetOnModalClose = resetFormFields;
+  });
+
+  // additional drag protection on whole card
+  document.querySelectorAll('.form-card, .modal-card').forEach(el => {
+    el.addEventListener('dragstart', e => e.preventDefault());
+    el.addEventListener('selectstart', e => e.preventDefault());
+  });
+
+  // if total marks field loses focus, ensure obtained marks not exceeding
+  const obtainedInput = document.getElementById('obtainedMarks');
+  const totalInput = document.getElementById('totalMarks');
+  function validateObtained() {
+    const total = parseFloat(totalInput.value);
+    const obtained = parseFloat(obtainedInput.value);
+    if (!isNaN(total) && !isNaN(obtained) && obtained > total) {
+      formErrorDiv.innerText = '⚠️ Obtained marks cannot exceed total marks.';
+    } else if (formErrorDiv.innerText.includes('exceed')) {
+      if (!(obtained > total)) formErrorDiv.innerText = '';
+    }
+  }
+  obtainedInput.addEventListener('input', validateObtained);
+  totalInput.addEventListener('input', validateObtained);
+</script>
+</body>
+</html>

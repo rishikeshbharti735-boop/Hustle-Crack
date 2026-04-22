@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard — Hustle & Crack{% endblock %}
+
+{% block styles %}
+<style>
+  /* Additional dashboard-specific styles (already in your existing file) */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .stat-card {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-card);
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    color: var(--gold);
+  }
+  .action-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .search-box {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: 60px;
+    padding: 0.5rem 1rem;
+    display: flex;
+    gap: 8px;
+    width: 280px;
+  }
+  .search-box input {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    width: 100%;
+    outline: none;
+  }
+  .export-buttons {
+    display: flex;
+    gap: 0.8rem;
+  }
+  .export-btn {
+    background: var(--glass);
+    border: 1px solid var(--gold-dim);
+    border-radius: 40px;
+    padding: 0.5rem 1rem;
+    color: var(--gold);
+    cursor: pointer;
+  }
+  .table-wrapper {
+    background: var(--glass);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--glass-border);
+    overflow-x: auto;
+    padding: 0.5rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 0.8rem 0.6rem;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    text-align: left;
+  }
+  th { color: var(--gold); }
+  .student-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .action-icons i {
+    margin: 0 6px;
+    cursor: pointer;
+  }
+  .fa-edit { color: var(--gold-light); }
+  .fa-trash-alt { color: #FF7B7B; }
+  .fa-eye { color: #4CD98A; }
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.2s;
+    z-index: 1000;
+  }
+  .modal-overlay.active {
+    visibility: visible;
+    opacity: 1;
+  }
+  .modal-content {
+    background: #13131C;
+    border: 1px solid var(--gold);
+    border-radius: 28px;
+    padding: 2rem;
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container" style="max-width:1400px; margin:0 auto; padding:1rem;">
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-number">{{ total_students }}</div><div class="stat-label">Total Students</div></div>
+    <div class="stat-card"><div class="stat-number">{{ total_tests }}</div><div class="stat-label">Total Tests</div></div>
+    <div class="stat-card"><div class="stat-number">{{ avg_performance }}%</div><div class="stat-label">Avg Performance</div></div>
+    <div class="stat-card"><div class="stat-number">{{ pending_reports }}</div><div class="stat-label">Pending Reports</div></div>
+  </div>
+
+  <div class="action-bar">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search by name or ID...">
+    </div>
+    <div class="export-buttons">
+      <button class="export-btn" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Excel</button>
+      <button class="export-btn" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> PDF Summary</button>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Photo</th><th>Name</th><th>Class</th><th>Overall %</th><th>Remark</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="studentTableBody">
+        {% for s in students %}
+        <tr data-id="{{ s.id }}">
+          <td>{{ s.id }}</td>
+          <td><img src="{{ url_for('static', filename=s.photo) if s.photo else 'https://via.placeholder.com/40' }}" class="student-photo" onerror="this.src='https://via.placeholder.com/40'"></td>
+          <td>{{ s.name }}</td>
+          <td>{{ s.class }}</td>
+          <td>{{ s.percentage }}%</td>
+          <td><span class="remark-badge">{{ s.remark }}</span></td>
+          <td class="action-icons">
+            <i class="fas fa-edit" data-id="{{ s.id }}" data-name="{{ s.name }}" data-percent="{{ s.percentage }}"></i>
+            <i class="fas fa-trash-alt" data-id="{{ s.id }}"></i>
+            <i class="fas fa-eye" data-id="{{ s.id }}"></i>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Edit Percentage</h3>
+    <p>Student: <span id="editStudentName"></span></p>
+    <input type="number" id="editPercent" step="0.1" min="0" max="100">
+    <div class="modal-buttons" style="display:flex; gap:1rem; justify-content:center; margin-top:1rem;">
+      <button id="saveEditBtn" style="background:var(--gold); padding:0.5rem 1rem; border:none; border-radius:40px;">Save</button>
+      <button id="cancelEditBtn" style="background:var(--glass); padding:0.5rem 1rem; border:none; border-radius:40px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Report Modal -->
+<div id="reportModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:500px;">
+    <h3>Full Report</h3>
+    <div id="fullReportDetails"></div>
+    <button id="closeReportBtn" style="margin-top:1rem; background:var(--gold); border:none; padding:0.5rem 1rem; border-radius:30px;">Close</button>
+  </div>
+</div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+  // No client-side auth check – Flask @admin_required already protects this page
+  function getRemark(percent) {
+    if (percent >= 85) return "🌟 Excellent";
+    if (percent >= 70) return "✅ Very Good";
+    if (percent >= 55) return "📈 Good";
+    if (percent >= 40) return "⚠️ Needs focus";
+    return "❌ Critical";
+  }
+
+  // Search filter
+  const searchInput = document.getElementById('searchInput');
+  const tableRows = document.querySelectorAll('#studentTableBody tr');
+  searchInput.addEventListener('input', function() {
+    const term = this.value.toLowerCase();
+    tableRows.forEach(row => {
+      const id = row.cells[0].innerText.toLowerCase();
+      const name = row.cells[2].innerText.toLowerCase();
+      row.style.display = (id.includes(term) || name.includes(term)) ? '' : 'none';
+    });
+  });
+
+  // Edit modal logic
+  const editModal = document.getElementById('editModal');
+  const editStudentNameSpan = document.getElementById('editStudentName');
+  const editPercentInput = document.getElementById('editPercent');
+  let currentEditRow = null;
+  document.querySelectorAll('.fa-edit').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentEditRow = btn.closest('tr');
+      const name = btn.getAttribute('data-name');
+      const percent = btn.getAttribute('data-percent');
+      editStudentNameSpan.innerText = name;
+      editPercentInput.value = percent;
+      editModal.classList.add('active');
+    });
+  });
+  document.getElementById('saveEditBtn').addEventListener('click', () => {
+    if (currentEditRow) {
+      const newPercent = parseFloat(editPercentInput.value);
+      if (!isNaN(newPercent) && newPercent >= 0 && newPercent <= 100) {
+        const studentId = currentEditRow.querySelector('.fa-edit').getAttribute('data-id');
+        fetch("{{ url_for('edit_marks') }}", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ student_id: studentId, percentage: newPercent })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            // Update UI
+            const percentCell = currentEditRow.cells[4];
+            const remarkCell = currentEditRow.cells[5];
+            percentCell.innerText = newPercent + '%';
+            remarkCell.innerHTML = `<span class="remark-badge">${getRemark(newPercent)}</span>`;
+            // Update data attributes
+            currentEditRow.querySelector('.fa-edit').setAttribute('data-percent', newPercent);
+            editModal.classList.remove('active');
+          } else {
+            alert('Error: ' + data.error);
+          }
+        });
+      } else {
+        alert('Enter valid percentage (0-100)');
+      }
+    }
+  });
+  document.getElementById('cancelEditBtn').addEventListener('click', () => {
+    editModal.classList.remove('active');
+  });
+
+  // Delete student (optional: you need a backend endpoint)
+  document.querySelectorAll('.fa-trash-alt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (confirm('Delete this student permanently?')) {
+        const studentId = btn.getAttribute('data-id');
+        // You can implement a DELETE endpoint in app.py
+        alert('Delete endpoint not implemented yet. Student ID: ' + studentId);
+      }
+    });
+  });
+
+  // View full report
+  const reportModal = document.getElementById('reportModal');
+  document.querySelectorAll('.fa-eye').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const studentId = btn.getAttribute('data-id');
+      const row = btn.closest('tr');
+      const name = row.cells[2].innerText;
+      const percent = parseFloat(row.cells[4].innerText);
+      const remark = getRemark(percent);
+      const details = `
+        <p><strong>ID:</strong> ${studentId}</p>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Percentage:</strong> ${percent}%</p>
+        <p><strong>Remark:</strong> ${remark}</p>
+        <hr>
+        <p><i class="fas fa-chart-line"></i> Subject-wise (mock):</p>
+        <ul style="text-align:left;">
+          <li>Math: ${(percent * 0.95).toFixed(1)}%</li>
+          <li>Physics: ${(percent * 0.88).toFixed(1)}%</li>
+          <li>Chemistry: ${(percent * 0.82).toFixed(1)}%</li>
+        </ul>
+      `;
+      document.getElementById('fullReportDetails').innerHTML = details;
+      reportModal.classList.add('active');
+    });
+  });
+  document.getElementById('closeReportBtn').addEventListener('click', () => {
+    reportModal.classList.remove('active');
+  });
+
+  // Export functions
+  function exportToExcel() {
+    const rows = Array.from(document.querySelectorAll('#studentTableBody tr')).filter(r => r.style.display !== 'none');
+    const data = rows.map(r => ({
+      "Student ID": r.cells[0].innerText,
+      "Name": r.cells[2].innerText,
+      "Class": r.cells[3].innerText,
+      "Overall %": r.cells[4].innerText,
+      "Remark": r.cells[5].innerText
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Students");
+    XLSX.writeFile(wb, `students_${new Date().toISOString().slice(0,10)}.xlsx`);
+  }
+  async function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text("Hustle & Crack - Student Report", 20, 20);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 30);
+    const rows = Array.from(document.querySelectorAll('#studentTableBody tr')).filter(r => r.style.display !== 'none');
+    const tableData = rows.map(r => [
+      r.cells[0].innerText,
+      r.cells[2].innerText,
+      r.cells[3].innerText,
+      r.cells[4].innerText,
+      r.cells[5].innerText
+    ]);
+    doc.autoTable({
+      startY: 40,
+      head: [['ID', 'Name', 'Class', 'Percent', 'Remark']],
+      body: tableData,
+      theme: 'dark'
+    });
+    doc.save(`students_${new Date().toISOString().slice(0,10)}.pdf`);
+  }
+  document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+  document.getElementById('exportPdfBtn').addEventListener('click', exportToPDF);
+</script>
+{% endblock %}

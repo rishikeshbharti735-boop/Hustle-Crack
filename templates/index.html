@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hustle & Crack — Learn. Compete. Conquer.</title>
+  
+  <!-- CSS with url_for -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- TOP MARQUEE                            -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="top-marquee" aria-hidden="true">
+    <div class="marquee-content">
+      <span>Welcome to Hustle &amp; Crack — Your Ultimate Learning Hub for board exams, and More! &nbsp;•&nbsp;  Learn. Compete. Conquer. &nbsp;•&nbsp;</span>
+          </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- HERO SECTION                           -->
+  <!-- ══════════════════════════════════════ -->
+  <main class="hero">
+
+    <!-- Decorative background grid -->
+    <div class="bg-grid" aria-hidden="true"></div>
+    <!-- Glow orbs -->
+    <div class="orb orb-1" aria-hidden="true"></div>
+    <div class="orb orb-2" aria-hidden="true"></div>
+    <div class="orb orb-3" aria-hidden="true"></div>
+
+    <!-- Branding block -->
+    <div class="brand-block">
+      <p class="tagline-top">Welcome to</p>
+      <h1 class="brand-name">
+        <span class="brand-hustle">Hustle</span>
+        <span class="brand-amp">&</span>
+        <span class="brand-crack">Crack</span>
+      </h1>
+      <div class="brand-rule"></div>
+      <p class="brand-sub">Powered and Designed by <strong>Rishikesh Kumar Bharti</strong></p>
+    </div>
+
+    <!-- Welcome text -->
+    <div class="welcome-block">
+      <h2 class="welcome-text">
+        <span class="w-letter">W</span><span class="w-letter">e</span><span class="w-letter">l</span><span class="w-letter">c</span><span class="w-letter">o</span><span class="w-letter">m</span><span class="w-letter">e</span>
+      </h2>
+    </div>
+
+    <!-- Profile + Logo strip -->
+    <div class="visuals-strip" id="visuals-strip">
+
+      <!-- Profile Photo Card -->
+      <div class="visual-card" id="photo-card"
+           oncontextmenu="return false"
+           onselectstart="return false"
+           ondragstart="return false">
+        <div class="card-inner">
+          <div class="photo-frame">
+            <img
+              src="{{ url_for('static', filename='branding/my-photo.jpg') }}"
+              alt="Rishikesh Kumar Bharti"
+              class="protected-img"
+              draggable="false"
+              oncontextmenu="return false"
+            />
+            <div class="photo-overlay" aria-hidden="true"></div>
+          </div>
+          <p class="visual-label">Rishikesh Kumar Bharti</p>
+          <span class="visual-role">Founder · Educator · Mentor</span>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="vs-divider" aria-hidden="true">
+        <div class="vs-line"></div>
+        <span class="vs-dot"></span>
+        <div class="vs-line"></div>
+      </div>
+
+      <!-- Logo Card -->
+      <div class="visual-card" id="logo-card"
+           oncontextmenu="return false"
+           onselectstart="return false"
+           ondragstart="return false">
+        <div class="card-inner">
+          <div class="logo-frame">
+            <img
+              src="{{ url_for('static', filename='branding/hc-logo.png') }}"
+              alt="Hustle and Crack Logo"
+              class="protected-img"
+              draggable="false"
+              oncontextmenu="return false"
+            />
+            <div class="photo-overlay" aria-hidden="true"></div>
+          </div>
+          <p class="visual-label">Hustle &amp; Crack</p>
+          <span class="visual-role">Learn · Compete · Conquer</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Stats ribbon -->
+    <div class="stats-ribbon">
+      <div class="stat-item">
+        <span class="stat-num">500+</span>
+        <span class="stat-text">Students</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <span class="stat-num">10+</span>
+        <span class="stat-text">Years Experience</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <span class="stat-num">100% Result</span>
+        <span class="stat-text">Exam Focus</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <span class="stat-num">Begusarai</span>
+        <span class="stat-text">Bihar, India</span>
+      </div>
+    </div>
+
+    <!-- Continue Button -->
+    <div class="cta-block">
+      <button class="cta-btn" onclick="window.location.href='{{ url_for('portal_choice') }}'">
+        <span class="cta-text">Enter Portal</span>
+        <span class="cta-icon">→</span>
+      </button>
+      <p class="cta-hint">Choose your learning path inside</p>
+    </div>
+
+    <!-- Footer credit -->
+    <footer class="page-footer">
+      <p>© 2026-2027 <strong>Hustle &amp; Crack</strong> · All rights reserved.</p>
+    </footer>
+
+  </main>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- PROTECTION SCRIPT                      -->
+  <!-- ══════════════════════════════════════ -->
+  <script>
+    // Disable right-click globally
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Disable keyboard shortcuts for copy, save, view-source, inspect
+    document.addEventListener('keydown', e => {
+      const blocked = [
+        e.ctrlKey && ['c','u','s','a','p'].includes(e.key.toLowerCase()),
+        e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase()),
+        e.key === 'F12'
+      ];
+      if (blocked.some(Boolean)) e.preventDefault();
+    });
+
+    // Disable drag on all images
+    document.querySelectorAll('img').forEach(img => {
+      img.addEventListener('dragstart', e => e.preventDefault());
+      img.addEventListener('mousedown', e => { if (e.button === 2) e.preventDefault(); });
+    });
+
+    // Disable text selection on visual cards
+    document.querySelectorAll('.visual-card').forEach(card => {
+      card.addEventListener('selectstart', e => e.preventDefault());
+    });
+
+    // Scroll-triggered reveal for cards
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll('.visual-card, .stats-ribbon, .cta-block').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Student Registration — Hustle & Crack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C96A;
+      --gold-dim: #7A5F28;
+      --ink: #0A0A0C;
+      --ink-2: #111116;
+      --surface: #14141A;
+      --glass: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(201, 168, 76, 0.22);
+      --text: #F0EDE6;
+      --text-muted: #8A8577;
+      --red-marquee: #D62828;
+      --marquee-bg: #1A0606;
+      --radius-card: 28px;
+      --shadow-deep: 0 25px 45px rgba(0, 0, 0, 0.6);
+      --font-display: 'Bebas Neue', 'Playfair Display', serif;
+      --font-body: 'DM Sans', 'Noto Sans Devanagari', sans-serif;
+    }
+
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      min-height: 100vh;
+    }
+
+    /* ---- RED MARQUEE ---- */
+    .top-marquee {
+      background: var(--marquee-bg);
+      border-bottom: 2px solid var(--red-marquee);
+      overflow: hidden;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 110;
+    }
+    .marquee-content {
+      display: flex;
+      white-space: nowrap;
+      animation: scrollMarquee 28s linear infinite;
+    }
+    .marquee-content span {
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: #FF7B7B;
+      padding-right: 3rem;
+    }
+    @keyframes scrollMarquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* BG GRID & ORBS */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(201, 168, 76, 0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(201, 168, 76, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 520px;
+      height: 520px;
+      background: radial-gradient(circle, rgba(201, 168, 76, 0.1), transparent 70%);
+      top: -140px;
+      left: -100px;
+      animation: floatOrb 16s infinite alternate;
+    }
+    .orb-2 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(56, 130, 220, 0.08), transparent 70%);
+      bottom: -70px;
+      right: -50px;
+      animation: floatOrb 20s infinite alternate-reverse;
+    }
+    @keyframes floatOrb {
+      from { transform: translate(0, 0); }
+      to { transform: translate(35px, 30px); }
+    }
+
+    /* main container */
+    .reg-container {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1.5rem 2rem;
+    }
+
+    /* navigation */
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .back-btn {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 60px;
+      padding: 0.5rem 1.2rem;
+      color: var(--gold-dim);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+    .back-btn:hover {
+      background: rgba(201, 168, 76, 0.15);
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+    .brand-mini h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .brand-mini h2 span { color: var(--gold); }
+    .brand-mini p {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    /* glass form card */
+    .form-card {
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-card);
+      padding: 2rem 2rem 2.2rem;
+      box-shadow: var(--shadow-deep);
+    }
+    .form-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .form-title i {
+      color: var(--gold);
+      margin-right: 8px;
+    }
+
+    /* form grid */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+    @media (max-width: 600px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .input-group label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold-dim);
+      font-weight: 600;
+    }
+    .input-group input, .input-group select {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      border-radius: 14px;
+      padding: 0.8rem 1rem;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      outline: none;
+      transition: 0.2s;
+    }
+    .input-group input:focus, .input-group select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.2);
+    }
+    .error-text {
+      font-size: 0.7rem;
+      color: #FF7B7B;
+      margin-top: 0.2rem;
+    }
+
+    /* photo upload square preview */
+    .photo-area {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .preview-box {
+      width: 100px;
+      height: 100px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 16px;
+      border: 2px dashed var(--gold-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .preview-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .preview-placeholder {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    .file-btn {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      padding: 0.5rem 1rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .file-btn:hover {
+      background: rgba(201,168,76,0.2);
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border: none;
+      padding: 0.9rem;
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      letter-spacing: 0.1em;
+      color: var(--ink);
+      border-radius: 50px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    .submit-btn:hover {
+      opacity: 0.92;
+      transform: scale(0.99);
+    }
+
+    /* custom success modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0.2s, opacity 0.25s ease;
+    }
+    .modal-overlay.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-card {
+      background: #13131C;
+      border: 1px solid rgba(201, 168, 76, 0.5);
+      border-radius: 32px;
+      max-width: 400px;
+      width: 85%;
+      text-align: center;
+      padding: 2rem 1.5rem;
+      transform: scale(0.96);
+      transition: transform 0.25s ease;
+    }
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+    .modal-icon {
+      font-size: 3rem;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+    .modal-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+    }
+    .token-badge {
+      background: rgba(201, 168, 76, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 60px;
+      font-family: monospace;
+      font-size: 1.2rem;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      margin: 1rem 0;
+      display: inline-block;
+      border: 1px solid var(--gold-dim);
+    }
+    .modal-close {
+      background: var(--gold);
+      border: none;
+      padding: 0.6rem 1.5rem;
+      border-radius: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-marquee">
+  <div class="marquee-content">
+    <span>📝 NEW STUDENT REGISTRATION — Enroll today and get your unique ID. Complete all fields to secure admission. 📝</span>
+    <span>📝 NEW STUDENT REGISTRATION — Enroll today and get your unique ID. Complete all fields to secure admission. 📝</span>
+  </div>
+</div>
+<div class="bg-grid"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<main class="reg-container">
+  <div class="nav-row">
+    <a href="student_dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    <div class="brand-mini">
+      <h2>Hustle <span>&</span> Crack</h2>
+      <p>registration portal</p>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-title">
+      <i class="fas fa-user-graduate"></i> Student Registration
+    </div>
+    <form id="registrationForm">
+      <div class="form-row">
+        <div class="input-group">
+          <label><i class="fas fa-user"></i> Full Name *</label>
+          <input type="text" id="fullName" placeholder="e.g. Priya Kumari" required>
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-graduation-cap"></i> Class *</label>
+          <select id="classSelect" required>
+            <option value="">Select Class</option>
+            <option>Class 9</option><option>Class 10</option><option>Class 11 (Science)</option>
+            <option>Class 11 (Commerce)</option><option>Class 12 (Science)</option><option>Class 12 (Commerce)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="input-group">
+          <label><i class="fas fa-hashtag"></i> Roll Number *</label>
+          <input type="text" id="rollNumber" placeholder="School roll number" required>
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-father"></i> Father's Name *</label>
+          <input type="text" id="fatherName" placeholder="Father's full name" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="input-group">
+          <label><i class="fas fa-female"></i> Mother's Name *</label>
+          <input type="text" id="motherName" placeholder="Mother's full name" required>
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-phone-alt"></i> Phone Number (10 digits) *</label>
+          <input type="tel" id="phone" maxlength="10" placeholder="9876543210" required>
+          <div class="error-text" id="phoneError"></div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="input-group">
+          <label><i class="fab fa-whatsapp"></i> WhatsApp Number (10 digits) *</label>
+          <input type="tel" id="whatsapp" maxlength="10" placeholder="9876543210" required>
+          <div class="error-text" id="whatsappError"></div>
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-camera"></i> Photo Upload *</label>
+          <div class="photo-area">
+            <div class="preview-box" id="photoPreviewBox">
+              <div class="preview-placeholder" id="previewPlaceholder">📷 Preview</div>
+              <img id="previewImg" src="#" alt="preview" style="display: none; width:100%; height:100%; object-fit:cover;">
+            </div>
+            <div>
+              <input type="file" id="photoUpload" accept="image/jpeg,image/png,image/jpg" style="display:none;">
+              <button type="button" class="file-btn" id="choosePhotoBtn"><i class="fas fa-upload"></i> Choose File</button>
+              <div class="error-text" id="photoError"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn"><i class="fas fa-save"></i> Register & Generate ID</button>
+    </form>
+  </div>
+  <div class="footer-note">
+    <i class="fas fa-shield-alt"></i> Your data is stored locally. ID will be auto-generated.
+  </div>
+</main>
+
+<!-- SUCCESS MODAL -->
+<div id="successModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-icon"><i class="fas fa-check-circle"></i></div>
+    <h3>Registration Successful!</h3>
+    <p>Student ID generated:</p>
+    <div class="token-badge" id="generatedId">HC-2026-001</div>
+    <button class="modal-close" id="closeSuccessBtn">OK</button>
+  </div>
+</div>
+
+<script>
+  // ---------- DISABLE RIGHT-CLICK & COPY/INSPECT ----------
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    const blocked = [
+      e.ctrlKey && ['c','u','s','a','p'].includes(e.key.toLowerCase()),
+      e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase()),
+      e.key === 'F12'
+    ];
+    if (blocked.some(Boolean)) e.preventDefault();
+  });
+  document.querySelectorAll('img').forEach(img => {
+    img.addEventListener('dragstart', e => e.preventDefault());
+  });
+
+  // ---------- PHOTO UPLOAD & PREVIEW (square) ----------
+  const photoInput = document.getElementById('photoUpload');
+  const previewImg = document.getElementById('previewImg');
+  const previewPlaceholder = document.getElementById('previewPlaceholder');
+  const chooseBtn = document.getElementById('choosePhotoBtn');
+  const photoErrorSpan = document.getElementById('photoError');
+  let uploadedPhotoData = null;
+
+  chooseBtn.addEventListener('click', () => photoInput.click());
+  photoInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file && (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg')) {
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        previewImg.src = ev.target.result;
+        previewImg.style.display = 'block';
+        previewPlaceholder.style.display = 'none';
+        uploadedPhotoData = ev.target.result;
+        photoErrorSpan.innerText = '';
+      };
+      reader.readAsDataURL(file);
+    } else if (file) {
+      photoErrorSpan.innerText = 'Only JPG/PNG images allowed.';
+      previewImg.style.display = 'none';
+      previewPlaceholder.style.display = 'flex';
+      uploadedPhotoData = null;
+    } else {
+      resetPhotoPreview();
+    }
+  });
+
+  function resetPhotoPreview() {
+    photoInput.value = '';
+    previewImg.src = '#';
+    previewImg.style.display = 'none';
+    previewPlaceholder.style.display = 'flex';
+    uploadedPhotoData = null;
+  }
+
+  // ---------- ID GENERATION (HC-2026-XXX) sequential ----------
+  function generateStudentID() {
+    let counter = localStorage.getItem('hustleRegCounter');
+    if (!counter) {
+      counter = 1;
+      localStorage.setItem('hustleRegCounter', counter);
+    } else {
+      counter = parseInt(counter) + 1;
+      localStorage.setItem('hustleRegCounter', counter);
+    }
+    const currentYear = new Date().getFullYear();
+    const padded = String(counter).padStart(3, '0');
+    return `HC-${currentYear}-${padded}`;
+  }
+
+  // ---------- SAVE TO LOCALSTORAGE ----------
+  function saveStudentRecord(studentData) {
+    let records = JSON.parse(localStorage.getItem('hustleStudents') || '[]');
+    records.push(studentData);
+    localStorage.setItem('hustleStudents', JSON.stringify(records));
+  }
+
+  // ---------- FORM VALIDATION & SUBMIT ----------
+  const form = document.getElementById('registrationForm');
+  const phoneInput = document.getElementById('phone');
+  const whatsappInput = document.getElementById('whatsapp');
+  const phoneError = document.getElementById('phoneError');
+  const whatsappError = document.getElementById('whatsappError');
+
+  function isValidPhone(num) {
+    return /^\d{10}$/.test(num);
+  }
+
+  function clearErrors() {
+    phoneError.innerText = '';
+    whatsappError.innerText = '';
+    photoErrorSpan.innerText = '';
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    // get values
+    const fullName = document.getElementById('fullName').value.trim();
+    const className = document.getElementById('classSelect').value;
+    const rollNumber = document.getElementById('rollNumber').value.trim();
+    const fatherName = document.getElementById('fatherName').value.trim();
+    const motherName = document.getElementById('motherName').value.trim();
+    const phone = phoneInput.value.trim();
+    const whatsapp = whatsappInput.value.trim();
+
+    let isValid = true;
+    if (!fullName) { alert("Full Name is required"); isValid = false; }
+    else if (!className) { alert("Please select a Class"); isValid = false; }
+    else if (!rollNumber) { alert("Roll Number is required"); isValid = false; }
+    else if (!fatherName) { alert("Father's Name is required"); isValid = false; }
+    else if (!motherName) { alert("Mother's Name is required"); isValid = false; }
+    else if (!phone) { phoneError.innerText = "Phone number required"; isValid = false; }
+    else if (!isValidPhone(phone)) { phoneError.innerText = "Must be exactly 10 digits"; isValid = false; }
+    else if (!whatsapp) { whatsappError.innerText = "WhatsApp number required"; isValid = false; }
+    else if (!isValidPhone(whatsapp)) { whatsappError.innerText = "Must be exactly 10 digits"; isValid = false; }
+    else if (!uploadedPhotoData) { photoErrorSpan.innerText = "Please upload a photo"; isValid = false; }
+
+    if (!isValid) return;
+
+    // Generate unique ID
+    const studentID = generateStudentID();
+
+    // Build student object
+    const studentObj = {
+      id: studentID,
+      fullName: fullName,
+      class: className,
+      rollNumber: rollNumber,
+      fatherName: fatherName,
+      motherName: motherName,
+      phone: phone,
+      whatsapp: whatsapp,
+      photoData: uploadedPhotoData,   // base64 image
+      registeredOn: new Date().toISOString()
+    };
+
+    // Save to localStorage
+    saveStudentRecord(studentObj);
+
+    // Show success modal with generated ID
+    const modal = document.getElementById('successModal');
+    const generatedIdSpan = document.getElementById('generatedId');
+    generatedIdSpan.innerText = studentID;
+    modal.classList.add('active');
+
+    // Reset form after successful registration (optional but good UX)
+    form.reset();
+    resetPhotoPreview();
+    // clear any error styles
+    clearErrors();
+  });
+
+  // Close modal handler
+  const modal = document.getElementById('successModal');
+  const closeModalBtn = document.getElementById('closeSuccessBtn');
+  function closeModal() {
+    modal.classList.remove('active');
+  }
+  closeModalBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // additional protection for text selection inside form
+  document.querySelectorAll('.form-card, .input-group').forEach(el => {
+    el.addEventListener('selectstart', e => e.preventDefault());
+  });
+</script>
+</body>
+</html>

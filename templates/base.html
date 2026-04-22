@@ -1,0 +1,391 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>{% block title %}Hustle & Crack — Learn. Compete. Conquer.{% endblock %}</title>
+  
+  <!-- Google Fonts (Premium Typography) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+  
+  <!-- Font Awesome 6 (free icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  
+  <!-- Global CSS with url_for -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  
+  <!-- Page-Specific Styles Block -->
+  {% block styles %}{% endblock %}
+  
+  <style>
+    /* ====================================================
+       HUSTLE & CRACK — GLOBAL STYLESHEET (Embedded fallback)
+       Gold & Ink Theme · Glassmorphism · Premium Aesthetic
+       Designed by Rishikesh Kumar Bharti
+       ==================================================== */
+    
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C96A;
+      --gold-dim: #7A5F28;
+      --ink: #0A0A0C;
+      --ink-2: #111116;
+      --ink-3: #1A1A22;
+      --surface: #14141A;
+      --glass: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(201, 168, 76, 0.2);
+      --text: #F0EDE6;
+      --text-muted: #8A8577;
+      --red-marquee: #D62828;
+      --marquee-bg: #1A0606;
+      --radius-card: 28px;
+      --radius-sm: 16px;
+      --shadow-deep: 0 25px 45px rgba(0, 0, 0, 0.6);
+      --shadow-gold: 0 0 40px rgba(201, 168, 76, 0.15);
+      --font-display: 'Bebas Neue', 'Playfair Display', serif;
+      --font-body: 'DM Sans', 'Noto Sans Devanagari', sans-serif;
+      --font-serif: 'Playfair Display', serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+      position: relative;
+    }
+
+    /* ----- BACKGROUND GRID & FLOATING ORBS (Signature) ----- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(201, 168, 76, 0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(201, 168, 76, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb-1 {
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(201, 168, 76, 0.1), transparent 70%);
+      top: -150px;
+      left: -100px;
+      animation: floatOrb 16s infinite alternate;
+    }
+
+    .orb-2 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(56, 130, 220, 0.08), transparent 70%);
+      bottom: -80px;
+      right: -60px;
+      animation: floatOrb 20s infinite alternate-reverse;
+    }
+
+    @keyframes floatOrb {
+      from { transform: translate(0, 0); }
+      to { transform: translate(40px, 35px); }
+    }
+
+    /* ----- GLOBAL MARQUEE (Red Alert) ----- */
+    .global-marquee {
+      background: var(--marquee-bg);
+      border-bottom: 2px solid var(--red-marquee);
+      overflow: hidden;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 110;
+      box-shadow: 0 2px 15px rgba(214, 40, 40, 0.2);
+    }
+
+    .marquee-track {
+      display: flex;
+      white-space: nowrap;
+      animation: scrollMarquee 35s linear infinite;
+    }
+
+    .marquee-track span {
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: #FF7B7B;
+      padding-right: 3rem;
+      font-family: var(--font-body);
+    }
+
+    @keyframes scrollMarquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ----- HEADER / NAVIGATION (Glassmorphism) ----- */
+    .global-header {
+      position: sticky;
+      top: 42px;
+      z-index: 100;
+      background: rgba(10, 10, 12, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 0.8rem 2rem;
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo-area .brand-logo {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .brand-logo .gold-accent {
+      color: var(--gold);
+      font-size: 1.9rem;
+    }
+
+    .brand-tagline {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+    }
+
+    .brand-tagline strong {
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .main-nav ul {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .main-nav a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .main-nav a:hover {
+      color: var(--gold);
+    }
+
+    /* ----- MAIN CONTENT AREA ----- */
+    .global-main {
+      position: relative;
+      z-index: 2;
+      min-height: calc(100vh - 200px);
+      padding: 2rem 1.5rem;
+    }
+
+    /* ----- FOOTER (Elegant) ----- */
+    .global-footer {
+      background: rgba(10, 10, 12, 0.9);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--glass-border);
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2rem;
+    }
+
+    .footer-content p {
+      margin: 0.2rem 0;
+    }
+
+    .footer-credits i {
+      color: var(--gold-dim);
+    }
+
+    /* ----- RESPONSIVE ADJUSTMENTS ----- */
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+        text-align: center;
+      }
+      .main-nav ul {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      .global-main {
+        padding: 1.5rem 1rem;
+      }
+      .brand-logo {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* ----- UTILITY CLASSES (Reusable) ----- */
+    .glass-card {
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-card);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-deep);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .glass-card:hover {
+      border-color: rgba(201, 168, 76, 0.4);
+    }
+
+    .gold-text {
+      color: var(--gold);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 50px;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--ink);
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-gold:hover {
+      opacity: 0.92;
+      transform: scale(0.98);
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--ink-2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--gold-dim);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- ========== RED MARQUEE (Global Announcements) ========== -->
+  <div class="global-marquee">
+    <div class="marquee-track">
+      <span>🔥 HUSTLE & CRACK — India's Most Premium Learning Ecosystem 🔥 | Powered by Rishikesh Kumar Bharti | Board Exams · Mock Tests · Personalized Analytics 🔥</span>
+      <span>🔥 HUSTLE & CRACK — India's Most Premium Learning Ecosystem 🔥 | Powered by Rishikesh Kumar Bharti | Board Exams · Mock Tests · Personalized Analytics 🔥</span>
+    </div>
+  </div>
+
+  <!-- ========== NAVIGATION HEADER (Gold/Ink Branding) ========== -->
+  <header class="global-header">
+    <div class="header-container">
+      <div class="logo-area">
+        <h1 class="brand-logo">Hustle <span class="gold-accent">&</span> Crack</h1>
+        <p class="brand-tagline">Designed by <strong>Rishikesh Kumar Bharti</strong></p>
+      </div>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="{{ url_for('student_dashboard') }}"><i class="fas fa-user-graduate"></i> Student</a></li>
+          <li><a href="{{ url_for('teacher_dashboard') }}"><i class="fas fa-chalkboard-user"></i> Teacher</a></li>
+          <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-shield-alt"></i> Admin</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========== MAIN CONTENT (Dynamic Block) ========== -->
+  <main class="global-main">
+    {% block content %}
+    <!-- Child templates will inject content here -->
+    {% endblock %}
+  </main>
+
+  <!-- ========== GLOBAL FOOTER ========== -->
+  <footer class="global-footer">
+    <div class="footer-content">
+      <p>© 2026-2027  · Hustle & Crack ·</p>
+      <p class="footer-credits"><i class="fas fa-code"></i> Crafted with <i class="fas fa-heart" style="color: #C9A84C;"></i> by Rishikesh Kumar Bharti</p>
+    </div>
+  </footer>
+
+  <!-- ========== GLOBAL SECURITY & BRAND PROTECTION ========== -->
+  <script>
+    // Disable right-click globally
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    
+    // Disable keyboard shortcuts for copy, save, inspect, view-source
+    document.addEventListener('keydown', e => {
+      const blocked = [
+        e.ctrlKey && ['c', 'u', 's', 'a', 'p'].includes(e.key.toLowerCase()),
+        e.ctrlKey && e.shiftKey && ['i', 'j', 'c'].includes(e.key.toLowerCase()),
+        e.key === 'F12'
+      ];
+      if (blocked.some(Boolean)) e.preventDefault();
+    });
+    
+    // Disable drag on all images (protect branding assets)
+    document.querySelectorAll('img').forEach(img => {
+      img.addEventListener('dragstart', e => e.preventDefault());
+      img.addEventListener('mousedown', e => { if (e.button === 2) e.preventDefault(); });
+    });
+    
+    // Disable text selection on whole body (extra protection)
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+    
+    // Optional: disable console warning (light deterrent)
+    setInterval(() => {
+      if (window.console && window.console.clear) window.console.clear();
+    }, 3000);
+  </script>
+  
+  <!-- Page-Specific Scripts Block -->
+  {% block scripts %}{% endblock %}
+</body>
+</html>

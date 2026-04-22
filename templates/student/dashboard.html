@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Student Portal — Hustle & Crack</title>
+  <!-- Google Fonts + Font Awesome 6 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C96A;
+      --gold-dim: #7A5F28;
+      --ink: #0A0A0C;
+      --ink-2: #111116;
+      --surface: #14141A;
+      --glass: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(201, 168, 76, 0.2);
+      --text: #F0EDE6;
+      --text-muted: #8A8577;
+      --red-marquee: #D62828;
+      --marquee-bg: #1A0606;
+      --radius-card: 28px;
+      --shadow-deep: 0 25px 45px rgba(0, 0, 0, 0.6);
+      --font-display: 'Bebas Neue', 'Playfair Display', serif;
+      --font-body: 'DM Sans', 'Noto Sans Devanagari', sans-serif;
+    }
+
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      min-height: 100vh;
+    }
+
+    /* ---- MARQUEE (premium touch) ---- */
+    .top-marquee {
+      background: var(--marquee-bg);
+      border-bottom: 2px solid var(--red-marquee);
+      overflow: hidden;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 110;
+    }
+    .marquee-content {
+      display: flex;
+      white-space: nowrap;
+      animation: scrollMarquee 32s linear infinite;
+    }
+    .marquee-content span {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: #FF7B7B;
+      padding-right: 3rem;
+    }
+    @keyframes scrollMarquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ---- background grid & orbs ---- */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(201, 168, 76, 0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(201, 168, 76, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(201, 168, 76, 0.1), transparent 70%);
+      top: -150px;
+      left: -100px;
+      animation: floatOrb 16s infinite alternate;
+    }
+    .orb-2 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(56, 130, 220, 0.08), transparent 70%);
+      bottom: -80px;
+      right: -60px;
+      animation: floatOrb 20s infinite alternate-reverse;
+    }
+    @keyframes floatOrb {
+      from { transform: translate(0, 0); }
+      to { transform: translate(40px, 35px); }
+    }
+
+    /* main dashboard container */
+    .dashboard {
+      position: relative;
+      z-index: 2;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 2rem 2rem 3rem;
+    }
+
+    /* header branding */
+    .dash-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+      border-bottom: 1px solid rgba(201, 168, 76, 0.25);
+      padding-bottom: 1rem;
+    }
+    .brand h1 {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      letter-spacing: 0.02em;
+      line-height: 1;
+    }
+    .brand h1 span { color: var(--gold); }
+    .brand p {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+    .greeting {
+      text-align: right;
+    }
+    .greeting .small {
+      font-size: 0.75rem;
+      color: var(--gold-dim);
+    }
+    .greeting .name {
+      font-size: 1.4rem;
+      font-weight: 600;
+      font-family: var(--font-serif);
+      color: var(--gold-light);
+    }
+
+    /* 4 LARGE ACTION CARDS as LINKS */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.8rem;
+      margin: 2.5rem 0 2rem;
+    }
+    .action-card {
+      display: block;
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-card);
+      padding: 2rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      box-shadow: var(--shadow-deep);
+      text-decoration: none;
+      color: inherit;
+    }
+    .action-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      border-color: rgba(201, 168, 76, 0.6);
+      box-shadow: 0 30px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.3);
+      background: rgba(255,255,255,0.07);
+    }
+    .action-icon {
+      font-size: 3.4rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    .action-title {
+      font-family: var(--font-display);
+      font-size: 1.7rem;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.4rem;
+    }
+    .action-desc {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 2rem;
+    }
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--ink-2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--gold-dim);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="top-marquee">
+  <div class="marquee-content">
+    <span>🚀 HUSTLE & CRACK — STUDENT PORTAL · New registrations open for 2026-27 · Stay consistent, crack exams! 🚀</span>
+    <span>🚀 HUSTLE & CRACK — STUDENT PORTAL · New registrations open for 2026-27 · Stay consistent, crack exams! 🚀</span>
+  </div>
+</div>
+<div class="bg-grid"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<main class="dashboard">
+  <div class="dash-header">
+    <div class="brand">
+      <h1>Hustle <span>&</span> Crack</h1>
+      <p>student command center · begusarai</p>
+    </div>
+    <div class="greeting">
+      <div class="small"><i class="fas fa-user-graduate"></i> active session</div>
+      <div class="name" id="greetingName">Loading...</div>
+      <div class="small">Roll: HC-2412-09</div>
+    </div>
+  </div>
+
+  <!-- 4 ACTION LINKS (navigation) -->
+  <div class="actions-grid">
+    <a href="/student/register" class="action-card">
+      <div class="action-icon"><i class="fas fa-user-plus"></i></div>
+      <div class="action-title">New Registration</div>
+      <div class="action-desc">Enroll new student · generate ID</div>
+    </a>
+    <a href="/student/marks-entry" class="action-card">
+      <div class="action-icon"><i class="fas fa-edit"></i></div>
+      <div class="action-title">Class Test Marks Entry</div>
+      <div class="action-desc">Record & manage test scores</div>
+    </a>
+    <a href="/student/pdf-upload" class="action-card">
+      <div class="action-icon"><i class="fas fa-file-upload"></i></div>
+      <div class="action-title">Upload Online Exam PDF</div>
+      <div class="action-desc">Share question papers / answer keys</div>
+    </a>
+    <a href="/student/report-card" class="action-card">
+      <div class="action-icon"><i class="fas fa-chart-line"></i></div>
+      <div class="action-title">View Progress Report</div>
+      <div class="action-desc">Track performance & analytics</div>
+    </a>
+  </div>
+
+  <!-- info card (extra) -->
+  <div style="background: rgba(201,168,76,0.05); border-radius: 20px; padding: 0.8rem 1.2rem; margin-top: 0.5rem; text-align: center; font-size: 0.75rem; border: 1px solid rgba(201,168,76,0.15);">
+    <i class="fas fa-shield-alt"></i> Secure portal · All data encrypted · Powered by Hustle & Crack
+  </div>
+  <div class="footer-note">
+    © 2026-2027 Hustle & Crack — Student Management Suite
+  </div>
+</main>
+
+<script>
+  // ---------- GLOBAL PROTECTION (right-click / inspect) ----------
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    const blocked = [
+      e.ctrlKey && ['c','u','s','a','p'].includes(e.key.toLowerCase()),
+      e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase()),
+      e.key === 'F12'
+    ];
+    if (blocked.some(Boolean)) e.preventDefault();
+  });
+  document.querySelectorAll('img').forEach(img => {
+    img.addEventListener('dragstart', e => e.preventDefault());
+  });
+
+  // ---------- DYNAMIC GREETING (based on current time) ----------
+  function updateGreeting() {
+    const now = new Date();
+    const hour = now.getHours();
+    let greetingText = "";
+    if (hour >= 5 && hour < 12) greetingText = "Good Morning";
+    else if (hour >= 12 && hour < 17) greetingText = "Good Afternoon";
+    else if (hour >= 17 && hour < 21) greetingText = "Good Evening";
+    else greetingText = "Good Night";
+    
+    // You can customize the student name – here we use a fixed name "Rishikesh"
+    // as per requirement. Could be fetched from localStorage in a real scenario.
+    const studentName = "Rishikesh";
+    const greetingElement = document.getElementById('greetingName');
+    if (greetingElement) {
+      greetingElement.innerHTML = `${greetingText}, ${studentName}`;
+    }
+  }
+  updateGreeting();
+</script>
+</body>
+</html>

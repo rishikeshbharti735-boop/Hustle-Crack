@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Choose Your Portal — Hustle & Crack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C96A;
+      --gold-dim: #7A5F28;
+      --ink: #0A0A0C;
+      --ink-2: #111116;
+      --surface: #14141A;
+      --glass: rgba(255,255,255,0.04);
+      --glass-border: rgba(201,168,76,0.18);
+      --text: #F0EDE6;
+      --text-muted: #8A8577;
+      --font-display: 'Bebas Neue', serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* BG grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Gold orb glow */
+    body::after {
+      content: '';
+      position: fixed;
+      width: 700px; height: 400px;
+      background: radial-gradient(ellipse, rgba(201,168,76,0.09) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 860px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    /* ── HEADING ── */
+    .heading-block { text-align: center; animation: fade-up 0.7s ease both; }
+
+    .heading-eyebrow {
+      font-size: 0.75rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 0.4rem;
+    }
+
+    .heading-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      line-height: 0.92;
+      color: var(--text);
+    }
+
+    .heading-title span { color: var(--gold); }
+
+    .heading-rule {
+      width: 80px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0.9rem auto 0;
+    }
+
+    /* ── CARDS GRID ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.4rem;
+      width: 100%;
+      animation: fade-up 0.8s ease both 0.2s;
+    }
+
+    @media (max-width: 640px) {
+      .cards-grid { grid-template-columns: 1fr; max-width: 320px; }
+    }
+
+    .portal-card {
+      position: relative;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 2.2rem 1.5rem 1.8rem;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      overflow: hidden;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .portal-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    /* Student — blue tint */
+    .card-student::before { background: radial-gradient(ellipse at 50% 0%, rgba(56,130,220,0.12) 0%, transparent 70%); }
+    .card-student:hover { border-color: rgba(56,130,220,0.5); box-shadow: 0 20px 50px rgba(56,130,220,0.18), 0 0 0 1px rgba(56,130,220,0.2); transform: translateY(-8px); }
+    .card-student:hover::before { opacity: 1; }
+    .card-student .card-icon-bg { background: rgba(56,130,220,0.12); border: 1px solid rgba(56,130,220,0.25); }
+    .card-student .card-icon { color: #5BA3F5; }
+    .card-student .card-action { background: rgba(56,130,220,0.15); color: #5BA3F5; border-color: rgba(56,130,220,0.3); }
+    .card-student:hover .card-action { background: rgba(56,130,220,0.28); }
+
+    /* Teacher — green tint */
+    .card-teacher::before { background: radial-gradient(ellipse at 50% 0%, rgba(34,170,100,0.12) 0%, transparent 70%); }
+    .card-teacher:hover { border-color: rgba(34,170,100,0.5); box-shadow: 0 20px 50px rgba(34,170,100,0.18), 0 0 0 1px rgba(34,170,100,0.2); transform: translateY(-8px); }
+    .card-teacher:hover::before { opacity: 1; }
+    .card-teacher .card-icon-bg { background: rgba(34,170,100,0.12); border: 1px solid rgba(34,170,100,0.25); }
+    .card-teacher .card-icon { color: #4CD98A; }
+    .card-teacher .card-action { background: rgba(34,170,100,0.15); color: #4CD98A; border-color: rgba(34,170,100,0.3); }
+    .card-teacher:hover .card-action { background: rgba(34,170,100,0.28); }
+
+    /* Admin — gold tint */
+    .card-admin::before { background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.14) 0%, transparent 70%); }
+    .card-admin:hover { border-color: rgba(201,168,76,0.55); box-shadow: 0 20px 50px rgba(201,168,76,0.2), 0 0 0 1px rgba(201,168,76,0.25); transform: translateY(-8px); }
+    .card-admin:hover::before { opacity: 1; }
+    .card-admin .card-icon-bg { background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.25); }
+    .card-admin .card-icon { color: var(--gold); }
+    .card-admin .card-action { background: rgba(201,168,76,0.15); color: var(--gold-light); border-color: rgba(201,168,76,0.3); }
+    .card-admin:hover .card-action { background: rgba(201,168,76,0.28); }
+
+    .card-icon-bg {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.2rem;
+      position: relative; z-index: 1;
+      transition: transform 0.3s ease;
+    }
+
+    .portal-card:hover .card-icon-bg { transform: scale(1.1) rotate(-5deg); }
+
+    .card-icon {
+      font-size: 2rem;
+      position: relative; z-index: 1;
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 16px; right: 16px;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(201,168,76,0.15);
+      border: 1px solid rgba(201,168,76,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.65rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      position: relative; z-index: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .card-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      position: relative; z-index: 1;
+      margin-bottom: 1.4rem;
+    }
+
+    .card-action {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.45rem 1.1rem;
+      border-radius: 50px;
+      border: 1px solid;
+      transition: background 0.25s ease;
+      position: relative; z-index: 1;
+      margin-top: auto;
+    }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      opacity: 0.55;
+      animation: fade-up 0.8s ease both 0.5s;
+      text-align: center;
+    }
+
+    /* ══════════════════════════════
+       ADMIN PASSWORD MODAL
+    ══════════════════════════════ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-box {
+      background: #18181F;
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 2.5rem 2.2rem 2rem;
+      width: 90%;
+      max-width: 380px;
+      text-align: center;
+      position: relative;
+      transform: scale(0.92) translateY(20px);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,168,76,0.1);
+    }
+
+    .modal-backdrop.open .modal-box {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-lock {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      margin: 0 auto 1.2rem;
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+    }
+
+    .modal-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 1.6rem;
+    }
+
+    .modal-input-wrap { position: relative; margin-bottom: 0.8rem; }
+
+    .modal-input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 10px;
+      padding: 0.75rem 2.8rem 0.75rem 1rem;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+      letter-spacing: 0.12em;
+    }
+
+    .modal-input:focus {
+      border-color: rgba(201,168,76,0.5);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+    }
+
+    .modal-input.error {
+      border-color: #D62828;
+      box-shadow: 0 0 0 3px rgba(214,40,40,0.12);
+      animation: shake 0.35s ease;
+    }
+
+    .eye-toggle {
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .modal-error {
+      font-size: 0.72rem;
+      color: #FF6B6B;
+      margin-bottom: 0.8rem;
+      min-height: 1rem;
+      transition: opacity 0.2s;
+    }
+
+    .modal-submit {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+      color: var(--ink);
+      border: none;
+      border-radius: 10px;
+      padding: 0.8rem;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.15s ease;
+      margin-bottom: 0.8rem;
+    }
+
+    .modal-submit:hover { opacity: 0.9; transform: scale(1.02); }
+    .modal-submit:active { transform: scale(0.98); }
+
+    .modal-cancel {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      padding: 4px 8px;
+      transition: color 0.2s;
+    }
+    .modal-cancel:hover { color: var(--text); }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-8px); }
+      40%      { transform: translateX(8px); }
+      60%      { transform: translateX(-5px); }
+      80%      { transform: translateX(5px); }
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-wrap">
+
+    <!-- HEADING -->
+    <div class="heading-block">
+      <p class="heading-eyebrow">Hustle &amp; Crack Management System</p>
+      <h1 class="heading-title">Choose Your <span>Portal</span></h1>
+      <div class="heading-rule"></div>
+    </div>
+
+    <!-- CARDS -->
+    <div class="cards-grid">
+
+      <!-- Student -->
+      <a class="portal-card card-student" href="/student/dashboard">
+        <div class="card-icon-bg">
+          <span class="card-icon">🎓</span>
+        </div>
+        <h2 class="card-title">Student</h2>
+        <p class="card-desc">Access your exams, results, schedule &amp; learning materials.</p>
+        <span class="card-action">Enter &nbsp;→</span>
+      </a>
+
+      <!-- Teacher -->
+      <a class="portal-card card-teacher" href="/teacher/dashboard">
+        <div class="card-icon-bg">
+          <span class="card-icon">📋</span>
+        </div>
+        <h2 class="card-title">Teacher</h2>
+        <p class="card-desc">Manage classes, upload content, track student progress.</p>
+        <span class="card-action">Enter &nbsp;→</span>
+      </a>
+
+      <!-- Admin (password protected) -->
+      <div class="portal-card card-admin" onclick="openModal()">
+        <div class="card-badge">🔒</div>
+        <div class="card-icon-bg">
+          <span class="card-icon">⚙️</span>
+        </div>
+        <h2 class="card-title">Admin</h2>
+        <p class="card-desc">Full system control — admissions, fees, records &amp; analytics.</p>
+        <span class="card-action">🔒 &nbsp;Restricted</span>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <p class="page-footer">Hustle &amp; Crack Management System &nbsp;·&nbsp; &nbsp; © 2026-2027</p>
+
+  </div>
+
+  <!-- ══════════════════════════════
+       ADMIN PASSWORD MODAL
+  ══════════════════════════════ -->
+  <div class="modal-backdrop" id="adminModal" onclick="handleBackdropClick(event)">
+    <div class="modal-box" id="modalBox">
+      <div class="modal-lock">🔐</div>
+      <h2 class="modal-title">Admin Access</h2>
+      <p class="modal-sub">Restricted area. Enter admin password to continue.</p>
+
+      <div class="modal-input-wrap">
+        <input
+          type="password"
+          class="modal-input"
+          id="adminPwd"
+          placeholder="Enter password"
+          autocomplete="off"
+          onkeydown="if(event.key==='Enter') checkPassword()"
+        />
+        <button class="eye-toggle" id="eyeBtn" onclick="toggleEye()" tabindex="-1">👁</button>
+      </div>
+
+      <p class="modal-error" id="pwdError"></p>
+
+      <button class="modal-submit" onclick="checkPassword()">UNLOCK PORTAL</button>
+      <br/>
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    // ── Change this to your actual admin password ──
+    const ADMIN_PASSWORD = '7474';
+
+    function openModal() {
+      document.getElementById('adminModal').classList.add('open');
+      setTimeout(() => document.getElementById('adminPwd').focus(), 350);
+    }
+
+    function closeModal() {
+      document.getElementById('adminModal').classList.remove('open');
+      document.getElementById('adminPwd').value = '';
+      document.getElementById('adminPwd').classList.remove('error');
+      document.getElementById('pwdError').textContent = '';
+    }
+
+    function handleBackdropClick(e) {
+      if (e.target === document.getElementById('adminModal')) closeModal();
+    }
+
+    function toggleEye() {
+      const inp = document.getElementById('adminPwd');
+      const btn = document.getElementById('eyeBtn');
+      if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+      else { inp.type = 'password'; btn.textContent = '👁'; }
+    }
+
+    function checkPassword() {
+      const inp = document.getElementById('adminPwd');
+      const errEl = document.getElementById('pwdError');
+      if (inp.value === ADMIN_PASSWORD) {
+        errEl.textContent = '';
+        inp.classList.remove('error');
+        window.location.href = '/admin/dashboard';
+      } else {
+        errEl.textContent = '❌ Incorrect password. Please try again.';
+        inp.classList.add('error');
+        inp.value = '';
+        setTimeout(() => inp.classList.remove('error'), 700);
+        setTimeout(() => inp.focus(), 50);
+      }
+    }
+
+    // Esc key closes modal
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  </script>
+
+</body>
+</html>

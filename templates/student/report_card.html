@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Progress Report — Hustle & Crack</title>
+  <!-- Chart.js CDN for line graph -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C96A;
+      --gold-dim: #7A5F28;
+      --ink: #0A0A0C;
+      --ink-2: #111116;
+      --surface: #14141A;
+      --glass: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(201, 168, 76, 0.22);
+      --text: #F0EDE6;
+      --text-muted: #8A8577;
+      --red-marquee: #D62828;
+      --marquee-bg: #1A0606;
+      --radius-card: 28px;
+      --radius-modal: 28px;
+      --shadow-deep: 0 25px 45px rgba(0, 0, 0, 0.6);
+      --font-display: 'Bebas Neue', 'Playfair Display', serif;
+      --font-body: 'DM Sans', 'Noto Sans Devanagari', sans-serif;
+    }
+
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      min-height: 100vh;
+    }
+
+    /* ---- MARQUEE (red alert) ---- */
+    .top-marquee {
+      background: var(--marquee-bg);
+      border-bottom: 2px solid var(--red-marquee);
+      overflow: hidden;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 110;
+    }
+    .marquee-content {
+      display: flex;
+      white-space: nowrap;
+      animation: scrollMarquee 30s linear infinite;
+    }
+    .marquee-content span {
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: #FF7B7B;
+      padding-right: 3rem;
+    }
+    @keyframes scrollMarquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* BG GRID & ORBS */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(201, 168, 76, 0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(201, 168, 76, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 520px;
+      height: 520px;
+      background: radial-gradient(circle, rgba(201, 168, 76, 0.1), transparent 70%);
+      top: -140px;
+      left: -100px;
+      animation: floatOrb 16s infinite alternate;
+    }
+    .orb-2 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(56, 130, 220, 0.08), transparent 70%);
+      bottom: -70px;
+      right: -50px;
+      animation: floatOrb 20s infinite alternate-reverse;
+    }
+    @keyframes floatOrb {
+      from { transform: translate(0, 0); }
+      to { transform: translate(35px, 30px); }
+    }
+
+    /* main container */
+    .report-container {
+      position: relative;
+      z-index: 2;
+      max-width: 1300px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem 2rem;
+    }
+
+    /* navigation */
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .back-btn {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 60px;
+      padding: 0.5rem 1.2rem;
+      color: var(--gold-dim);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+    .back-btn:hover {
+      background: rgba(201, 168, 76, 0.15);
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+    .brand-mini h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .brand-mini h2 span { color: var(--gold); }
+    .brand-mini p {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    /* verification panel */
+    .verify-card {
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-card);
+      padding: 1.8rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-deep);
+    }
+    .verify-title {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .verify-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .input-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    .input-group label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold-dim);
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .input-group input {
+      width: 100%;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 14px;
+      padding: 0.7rem 1rem;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .input-group input:focus {
+      border-color: var(--gold);
+    }
+    .photo-preview {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(0,0,0,0.4);
+      border-radius: 20px;
+      padding: 0.5rem 1rem;
+    }
+    .preview-img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #2a2a2a;
+      border: 1px solid var(--gold-dim);
+    }
+    .verify-btn {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border: none;
+      padding: 0.7rem 1.8rem;
+      border-radius: 40px;
+      font-weight: bold;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .verify-btn:hover {
+      opacity: 0.9;
+    }
+    .error-msg {
+      color: #FF7B7B;
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+
+    /* REPORT CARD (initially hidden) */
+    .report-card {
+      display: none;
+      animation: fadeUp 0.5s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* profile header */
+    .profile-header {
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--glass-border);
+      padding: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .profile-photo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--gold);
+      box-shadow: 0 0 20px rgba(201,168,76,0.3);
+    }
+    .profile-details h2 {
+      font-family: var(--font-display);
+      font-size: 1.9rem;
+    }
+    .profile-details p {
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    /* summary tiles */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .tile {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 1rem;
+      text-align: center;
+      transition: 0.2s;
+    }
+    .tile-value {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--gold);
+    }
+    .tile-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    /* chart + subjects row */
+    .chart-container {
+      background: var(--glass);
+      border-radius: var(--radius-card);
+      padding: 1.2rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--glass-border);
+    }
+    canvas {
+      max-height: 280px;
+      width: 100%;
+    }
+    .subjects-table {
+      background: var(--glass);
+      border-radius: var(--radius-card);
+      padding: 1.2rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--glass-border);
+    }
+    .subjects-table h3 {
+      font-family: var(--font-display);
+      margin-bottom: 1rem;
+    }
+    .subject-row {
+      margin-bottom: 1rem;
+    }
+    .subject-name {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 5px;
+    }
+    .progress-bar-bg {
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      height: 8px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      width: 0%;
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.5s ease;
+    }
+    .ai-remark {
+      background: rgba(201,168,76,0.1);
+      border-left: 4px solid var(--gold);
+      padding: 1rem;
+      border-radius: 16px;
+      margin: 1rem 0;
+    }
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .print-btn, .dashboard-btn {
+      padding: 0.7rem 1.8rem;
+      border-radius: 40px;
+      font-weight: bold;
+      font-family: var(--font-body);
+      border: none;
+      cursor: pointer;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: var(--gold);
+      transition: 0.2s;
+    }
+    .print-btn:hover, .dashboard-btn:hover {
+      background: rgba(201,168,76,0.2);
+      border-color: var(--gold);
+    }
+    .dashboard-btn {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+      .top-marquee, .verify-card, .back-btn, .action-buttons, .orb, .bg-grid, .nav-row .back-btn, footer {
+        display: none !important;
+      }
+      .report-card {
+        display: block !important;
+      }
+      .glass-card, .profile-header, .tile, .chart-container, .subjects-table {
+        background: white;
+        border: 1px solid #ccc;
+        color: black;
+      }
+      .tile-value { color: #b8860b; }
+      .progress-fill { background: #b8860b; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-marquee">
+  <div class="marquee-content">
+    <span>📊 STUDENT PROGRESS REPORT — Personalized performance analytics. 📊 Verify ID & photo to access detailed report card.</span>
+    <span>📊 STUDENT PROGRESS REPORT — Personalized performance analytics. 📊 Verify ID & photo to access detailed report card.</span>
+  </div>
+</div>
+
+<div class="bg-grid"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<main class="report-container">
+  <div class="nav-row">
+    <a href="student_dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    <div class="brand-mini">
+      <h2>Hustle <span>&</span> Crack</h2>
+      <p>progress report</p>
+    </div>
+  </div>
+
+  <!-- Verification Panel -->
+  <div class="verify-card" id="verifyPanel">
+    <div class="verify-title"><i class="fas fa-id-card"></i> Identity Verification</div>
+    <div class="verify-form">
+      <div class="input-group">
+        <label>Student ID / Roll Number</label>
+        <input type="text" id="studentIdInput" placeholder="e.g. HC-2026-001" />
+      </div>
+      <div class="input-group">
+        <label>Upload Photo (temporary verification)</label>
+        <div class="photo-preview">
+          <img id="verifyPhotoPreview" class="preview-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24' fill='%238A8577'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="preview" />
+          <input type="file" id="photoUploadVerify" accept="image/jpeg,image/png" style="font-size:0.7rem;" />
+        </div>
+      </div>
+      <button class="verify-btn" id="generateReportBtn"><i class="fas fa-chart-simple"></i> Generate Report</button>
+    </div>
+    <div id="verifyError" class="error-msg"></div>
+  </div>
+
+  <!-- REPORT CARD (hidden until verification) -->
+  <div id="reportCard" class="report-card">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <img id="reportStudentPhoto" class="profile-photo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='%238A8577'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="Student Photo" />
+      <div class="profile-details">
+        <h2 id="studentNameDisplay">Aarav Sharma</h2>
+        <p><i class="fas fa-father"></i> Father: <span id="fatherName">Rakesh Sharma</span> &nbsp;|&nbsp; <i class="fas fa-female"></i> Mother: <span id="motherName">Neha Sharma</span></p>
+        <p><i class="fas fa-id-badge"></i> ID: <span id="studentIdDisplay">HC-2026-001</span></p>
+      </div>
+    </div>
+
+    <!-- Summary Tiles -->
+    <div class="summary-grid">
+      <div class="tile"><div class="tile-value" id="overallPercent">--</div><div class="tile-label">Overall Percentage</div></div>
+      <div class="tile"><div class="tile-value" id="currentGrade">--</div><div class="tile-label">Current Grade</div></div>
+      <div class="tile"><div class="tile-value" id="totalTests">--</div><div class="tile-label">Total Tests Taken</div></div>
+      <div class="tile"><div class="tile-value" id="attendanceRemark">--</div><div class="tile-label">Consistency Remark</div></div>
+    </div>
+
+    <!-- Performance Chart (Line) -->
+    <div class="chart-container">
+      <h3 style="font-family:var(--font-display); margin-bottom:0.5rem;"><i class="fas fa-chart-line"></i> Progress Trend (Test wise)</h3>
+      <canvas id="progressChart" width="400" height="200" style="max-width:100%; height:auto;"></canvas>
+    </div>
+
+    <!-- Subject-wise Progress Bars -->
+    <div class="subjects-table">
+      <h3><i class="fas fa-chart-simple"></i> Subject-wise Performance</h3>
+      <div id="subjectList"></div>
+    </div>
+
+    <!-- AI Remarks -->
+    <div class="ai-remark" id="aiRemarkBox">
+      <i class="fas fa-robot"></i> <strong>AI Analysis:</strong> <span id="aiRemarkText">--</span>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="print-btn" id="printReportBtn"><i class="fas fa-print"></i> Print / Download PDF</button>
+      <a href="student_dashboard.html" class="dashboard-btn"><i class="fas fa-tachometer-alt"></i> Back to Dashboard</a>
+    </div>
+  </div>
+  <footer>© 2026-2027 Hustle & Crack · Verified report | Secure & private</footer>
+</main>
+
+<script>
+  // ---------- DISABLE RIGHT-CLICK & COPY PROTECTION ----------
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    const blocked = [
+      e.ctrlKey && ['c','u','s','a','p'].includes(e.key.toLowerCase()),
+      e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase()),
+      e.key === 'F12'
+    ];
+    if (blocked.some(Boolean)) e.preventDefault();
+  });
+  document.querySelectorAll('img').forEach(img => {
+    img.addEventListener('dragstart', e => e.preventDefault());
+  });
+
+  // Mock student data (based on ID, but demo uses consistent data)
+  // For demo purpose, we load static data but show dynamic based on ID (customizable)
+  const studentDB = {
+    "HC-2026-001": { name: "Aarav Sharma", father: "Rakesh Sharma", mother: "Neha Sharma", overall: 84.5, grade: "A", tests: 4, attendance: "92% · Very Consistent" },
+    "HC-2026-002": { name: "Priya Singh", father: "Amit Singh", mother: "Sunita Singh", overall: 91.2, grade: "A+", tests: 4, attendance: "95% · Excellent" },
+    "default": { name: "Rohan Verma", father: "Sanjay Verma", mother: "Kavita Verma", overall: 68.3, grade: "B+", tests: 3, attendance: "78% · Needs Regularity" }
+  };
+
+  // Subject percentages (static demo)
+  const subjectData = [
+    { name: "Physics", percent: 78 },
+    { name: "Mathematics", percent: 88 },
+    { name: "Chemistry", percent: 74 },
+    { name: "English", percent: 92 },
+    { name: "Computer Science", percent: 86 }
+  ];
+
+  // Test marks for chart
+  const testMarks = [65, 72, 80, 85]; // Test1, Test2, Test3, Test4
+
+  let chartInstance = null;
+
+  // Helper: update report card with selected student data
+  function updateReportCard(studentId, photoUrl) {
+    const student = studentDB[studentId] || studentDB["default"];
+    // update profile
+    document.getElementById('studentNameDisplay').innerText = student.name;
+    document.getElementById('fatherName').innerText = student.father;
+    document.getElementById('motherName').innerText = student.mother;
+    document.getElementById('studentIdDisplay').innerText = studentId;
+    if (photoUrl && photoUrl !== "") {
+      document.getElementById('reportStudentPhoto').src = photoUrl;
+    } else {
+      document.getElementById('reportStudentPhoto').src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='%238A8577'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
+    }
+    // summary tiles
+    const overallVal = student.overall;
+    document.getElementById('overallPercent').innerText = overallVal + "%";
+    let grade = student.grade;
+    if (overallVal >= 85) grade = "A+";
+    else if (overallVal >= 70) grade = "A";
+    else if (overallVal >= 55) grade = "B+";
+    else grade = "C";
+    document.getElementById('currentGrade').innerText = grade;
+    document.getElementById('totalTests').innerText = student.tests;
+    document.getElementById('attendanceRemark').innerText = student.attendance;
+
+    // Subject-wise progress bars
+    const subjectContainer = document.getElementById('subjectList');
+    subjectContainer.innerHTML = "";
+    subjectData.forEach(sub => {
+      const rowDiv = document.createElement('div');
+      rowDiv.className = "subject-row";
+      rowDiv.innerHTML = `
+        <div class="subject-name"><span>${sub.name}</span><span>${sub.percent}%</span></div>
+        <div class="progress-bar-bg"><div class="progress-fill" style="width: ${sub.percent}%;"></div></div>
+      `;
+      subjectContainer.appendChild(rowDiv);
+    });
+
+    // AI Remark based on overall percentage
+    let aiText = "";
+    if (overallVal >= 80) aiText = "✨ Excellent! Keep up the brilliant performance. Your consistency is inspiring! ✨";
+    else if (overallVal >= 60) aiText = "👍 Good work! With a bit more effort in weak subjects, you can achieve top grades. 👍";
+    else if (overallVal >= 45) aiText = "📚 Needs more focus. Pay extra attention to Physics & Chemistry. Regular revisions will help. 📚";
+    else aiText = "⚠️ Needs significant improvement. Please contact teachers for additional support and study plan. ⚠️";
+    // Add subject-specific if low
+    const weakSubjects = subjectData.filter(s => s.percent < 60);
+    if (weakSubjects.length > 0 && overallVal < 70) {
+      aiText = `⚠️ Needs more focus in ${weakSubjects.map(s => s.name).join(', ')}. ` + aiText;
+    }
+    document.getElementById('aiRemarkText').innerText = aiText;
+
+    // update chart
+    if (chartInstance) chartInstance.destroy();
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    chartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Test 1', 'Test 2', 'Test 3', 'Test 4'],
+        datasets: [{
+          label: 'Marks (%)',
+          data: testMarks,
+          borderColor: '#C9A84C',
+          backgroundColor: 'rgba(201,168,76,0.1)',
+          borderWidth: 3,
+          pointBackgroundColor: '#E8C96A',
+          pointBorderColor: '#0A0A0C',
+          pointRadius: 5,
+          tension: 0.2,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { labels: { color: '#F0EDE6' } } },
+        scales: { y: { beginAtZero: true, max: 100, grid: { color: 'rgba(201,168,76,0.2)' }, ticks: { color: '#F0EDE6' } }, x: { ticks: { color: '#F0EDE6' } } }
+      }
+    });
+  }
+
+  // Verification & Report Generation
+  const generateBtn = document.getElementById('generateReportBtn');
+  const studentIdInput = document.getElementById('studentIdInput');
+  const photoUpload = document.getElementById('photoUploadVerify');
+  const verifyPhotoPreview = document.getElementById('verifyPhotoPreview');
+  const verifyError = document.getElementById('verifyError');
+  const reportCardDiv = document.getElementById('reportCard');
+  let uploadedPhotoData = null;
+
+  // preview uploaded photo
+  photoUpload.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file && (file.type === 'image/jpeg' || file.type === 'image/png')) {
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        verifyPhotoPreview.src = ev.target.result;
+        uploadedPhotoData = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      verifyPhotoPreview.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24' fill='%238A8577'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
+      uploadedPhotoData = null;
+      verifyError.innerText = "Only JPG/PNG allowed for photo verification.";
+      setTimeout(() => { if(verifyError.innerText.includes("Only JPG")) verifyError.innerText = ""; }, 2000);
+    }
+  });
+
+  generateBtn.addEventListener('click', () => {
+    const studentId = studentIdInput.value.trim();
+    if (!studentId) {
+      verifyError.innerText = "❌ Please enter Student ID / Roll Number.";
+      return;
+    }
+    if (!uploadedPhotoData) {
+      verifyError.innerText = "❌ Please upload a photo for identity verification (temporary).";
+      return;
+    }
+    verifyError.innerText = "";
+    // Show report card
+    updateReportCard(studentId, uploadedPhotoData);
+    reportCardDiv.style.display = "block";
+    // Scroll smoothly to report
+    reportCardDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Print / Download PDF
+  const printBtn = document.getElementById('printReportBtn');
+  printBtn.addEventListener('click', () => {
+    window.print();
+  });
+
+  // initially hide report card
+  reportCardDiv.style.display = "none";
+
+  // optional: set default demo ID for quick test? not mandatory but helpful
+  // prefill demo for convenience
+  studentIdInput.value = "HC-2026-001";
+  // simulate default photo? we don't auto-upload for security, but user must click upload. For demonstration we can set dummy, but require manual upload.
+  // just provide helper message
+  const helperMsg = document.createElement('div');
+  helperMsg.style.fontSize = "0.7rem";
+  helperMsg.style.color = "#7A5F28";
+  helperMsg.style.marginTop = "0.5rem";
+  helperMsg.innerHTML = "<i class='fas fa-info-circle'></i> Demo: Use ID 'HC-2026-001' and upload any image to see report.";
+  document.querySelector('.verify-card').appendChild(helperMsg);
+</script>
+</body>
+</html>
